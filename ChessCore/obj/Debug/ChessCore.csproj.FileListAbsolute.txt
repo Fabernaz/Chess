@@ -1,0 +1,11 @@
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\ChessCore\obj\Debug\ChessCore.csprojAssemblyReference.cache
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\ChessCore\obj\Debug\ChessCore.Properties.Resource.resources
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\ChessCore\obj\Debug\ChessCore.csproj.GenerateResource.cache
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\ChessCore\obj\Debug\ChessCore.csproj.CoreCompileInputs.cache
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\ChessCore\bin\Debug\ChessCore.dll
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\ChessCore\bin\Debug\ChessCore.pdb
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\ChessCore\bin\Debug\Common.dll
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\ChessCore\bin\Debug\Common.pdb
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\ChessCore\obj\Debug\ChessCore.csproj.CopyComplete
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\ChessCore\obj\Debug\ChessCore.dll
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\ChessCore\obj\Debug\ChessCore.pdb

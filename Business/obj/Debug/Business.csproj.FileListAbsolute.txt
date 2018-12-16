@@ -1,0 +1,5 @@
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Business\bin\Debug\Business.dll
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Business\bin\Debug\Business.pdb
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Business\obj\Debug\Business.csproj.CoreCompileInputs.cache
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Business\obj\Debug\Business.dll
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Business\obj\Debug\Business.pdb
