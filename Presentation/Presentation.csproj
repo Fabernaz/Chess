@@ -164,9 +164,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Board\ViewModels\BoardCellVM.cs" />
+    <Compile Include="Board\ViewModels\SquareVM.cs" />
     <Compile Include="Converters\BoolInvertedVisibilityConverter.cs" />
-    <Compile Include="ReactiveModelViewModelBase.cs" />
     <Compile Include="ReactiveViewModelBase.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Board\ViewModels\BoardVM.cs" />

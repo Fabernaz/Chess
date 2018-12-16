@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Users\Nazario\Documents\Visual Studio 2017\Projects\Chess\Presentation\obj\Debug\
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Presentation\obj\Debug\
 Chess
 none
 false
 DEBUG;TRACE
-C:\Users\Nazario\Documents\Visual Studio 2017\Projects\Chess\Presentation\App.xaml
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Presentation\App.xaml
 3955272235
 
-201099564169
-161-891367872
+191396434463
+1611136897147
 MainWindow\Views\MainWindow.xaml;Board\Views\BoardCellControl.xaml;Board\Views\BoardControl.xaml;
 
-True
+False
 

@@ -19,12 +19,12 @@ namespace Presentation
     {
         private static readonly Uri DARK_SQUARE_URI = new Uri("pack://application:,,,/Board/Images/DarkSquare.jpg");
         private static readonly Uri LIGHT_SQUARE_URI = new Uri("pack://application:,,,/Board/Images/LightSquare.jpg");
-        private readonly BoardCellVM _vm;
+        private readonly SquareVM _vm;
         private readonly BoardVM _board;
 
         public SquareCoordinate Position { get; }
 
-        public BoardCellControl(BoardCellVM vm)
+        public BoardCellControl(SquareVM vm)
         {
             _vm = vm;
             _board = vm.Board;
@@ -78,8 +78,8 @@ namespace Presentation
 
         private void UserControl_Drop(object sender, DragEventArgs e)
         {
-            var startingCellVM = (BoardCellVM)e.Data.GetData(typeof(BoardCellVM));
-            var endingCellVM = this.DataContext as BoardCellVM;
+            var startingCellVM = (SquareVM)e.Data.GetData(typeof(SquareVM));
+            var endingCellVM = this.DataContext as SquareVM;
 
             if (startingCellVM != endingCellVM)
                 startingCellVM.Board.OnMoveMade(startingCellVM, endingCellVM);
@@ -89,7 +89,7 @@ namespace Presentation
 
         private bool HasRightColorPiece()
         {
-            var vm = DataContext as BoardCellVM;
+            var vm = DataContext as SquareVM;
             return vm.Piece != null
                 && vm.Piece.Color == vm.Board.NextMoveTurn;
         }
@@ -98,7 +98,7 @@ namespace Presentation
         {
             var cellControl = sender as BoardCellControl;
             var imageSize = cellControl.ActualHeight - 2 * cellControl.TopRow.ActualHeight;
-            var imageUri = ((BoardCellVM)DataContext).Piece.ImageUri;
+            var imageUri = ((SquareVM)DataContext).Piece.ImageUri;
             var cursor = CursorHelper.CreateCursor(GetCursorTemplate(imageUri, imageSize), true);
             Mouse.SetCursor(cursor);
 

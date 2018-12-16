@@ -6,38 +6,40 @@ namespace Presentation
 {
     public interface IBoardVM
     {
-        IEnumerable<BoardCellVM> Cells { get; }
+        IEnumerable<SquareVM> Cells { get; }
         Color NextMoveTurn { get; }
 
-        void OnMoveMade(BoardCellVM starting, BoardCellVM ending);
+        void OnMoveMade(SquareVM starting, SquareVM ending);
     }
 
-    public class BoardVM : ReactiveModelViewModelBase<Board>, IBoardVM
+    public class BoardVM : ReactiveViewModelBase, IBoardVM
     {
-        private List<BoardCellVM> _availableSquares;
-        private BoardCellVM _startingSquare;
+        private List<SquareVM> _AvailableSquares;
+        private SquareVM _StartingSquare;
+        private Board _Board;
 
-        public IEnumerable<BoardCellVM> Cells { get; }
+        public IEnumerable<SquareVM> Cells { get; }
 
-        public Color NextMoveTurn { get { return Model.NextMoveTurn; } }
+        public Color NextMoveTurn { get { return _Board.NextMoveTurn; } }
 
-        public BoardVM(Board model)
-            : base(model)
+        public BoardVM(Board board)
         {
-            Cells = model.GetSquares()
-                         .Select(m => new BoardCellVM(m, this))
+            _Board = board;
+
+            Cells = board.GetSquares()
+                         .Select(m => new SquareVM(m, this))
                          .ToList(); //This is to end deferred execution
         }
 
-        public void OnMoveMade(BoardCellVM startingCell, BoardCellVM endingCell)
+        public void OnMoveMade(SquareVM startingCell, SquareVM endingCell)
         {
-            Model.TryPlayMove(startingCell.Model, endingCell.Model);
+            _Board.TryPlayMove(startingCell.Square, endingCell.Square);
         }
 
-        public void MoveStarted(BoardCellVM startingSquare)
+        public void MoveStarted(SquareVM startingSquare)
         {
-            _availableSquares = new List<BoardCellVM>();
-            _startingSquare = startingSquare;
+            _AvailableSquares = new List<SquareVM>();
+            _StartingSquare = startingSquare;
 
             startingSquare.MovingPiece = true;
 
@@ -46,15 +48,15 @@ namespace Presentation
             {
                 var cellVM = Cells.Single(c => c.Position == square);
                 cellVM.PlayableMoveForPlayer = true;
-                _availableSquares.Add(cellVM);
+                _AvailableSquares.Add(cellVM);
             }
         }
 
         public void MoveEnded()
         {
-            _startingSquare.MovingPiece = false;
+            _StartingSquare.MovingPiece = false;
 
-            foreach (var square in _availableSquares)
+            foreach (var square in _AvailableSquares)
                 square.PlayableMoveForPlayer = false;
         }
     }

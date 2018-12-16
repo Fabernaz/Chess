@@ -46,7 +46,7 @@ namespace Presentation
             Resize();
         }
 
-        private BoardCellControl GetCellFromVM(BoardCellVM vm)
+        private BoardCellControl GetCellFromVM(SquareVM vm)
         {
             return new BoardCellControl(vm);
         }
