@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace ChessCore
 {
-    public class GenericMove : MoveBase
+    public class Move : MoveBase
     {
         #region Fields
 
-        private readonly GenericMove _ambiguousMove;
+        private readonly Move _ambiguousMove;
         private readonly Piece _promotedTo;
-        private readonly Position _startingPosition;
-        private readonly Position _endingPosition;
+        private readonly SquareCoordinate _startingCoordinate;
+        private readonly SquareCoordinate _endingCoordinate;
         private readonly Piece _movedPiece;
         private readonly Piece _capturedPiece;
         private readonly PieceMove _moveInfo;
@@ -22,24 +22,24 @@ namespace ChessCore
 
         #region Constructors
 
-        internal GenericMove(Position startingPosition,
-                             Position endingPosition,
+        internal Move(SquareCoordinate startingCoordinate,
+                             SquareCoordinate endingCoordinate,
                              Piece movedPiece,
                              Piece capturedPiece,
                              bool isCapture,
-                             GenericMove ambiguousMove,
+                             Move ambiguousMove,
                              Piece promotedTo)
             : base(isCapture)
         {
-            _startingPosition = startingPosition;
-            _endingPosition = endingPosition;
+            _startingCoordinate = startingCoordinate;
+            _endingCoordinate = endingCoordinate;
             _movedPiece = movedPiece;
             _capturedPiece = capturedPiece;
             _ambiguousMove = ambiguousMove;
             _promotedTo = promotedTo;
 
-            _moveInfo = new PieceMove(_startingPosition,
-                                     _endingPosition,
+            _moveInfo = new PieceMove(_startingCoordinate,
+                                     _endingCoordinate,
                                      _movedPiece,
                                      _capturedPiece);
         }
@@ -50,7 +50,7 @@ namespace ChessCore
 
         internal override void OnMovePlayed()
         {
-            _movedPiece.OnPieceMoved(_endingPosition);
+            _movedPiece.OnPieceMoved(_endingCoordinate);
             _capturedPiece?.OnPieceCaptured();
         }
 
@@ -70,8 +70,8 @@ namespace ChessCore
         public override string ToString()
         {
             var piece = GetPieceNotation();
-            var endingFile = MoveUtilities.GetFileFromInt(_endingPosition.File);
-            var rank = _endingPosition.Rank;
+            var endingFile = MoveUtilities.GetFileFromInt(_endingCoordinate.File);
+            var rank = _endingCoordinate.Rank;
             var isCapture = GetCaptureRepresentation(IsCapture);
             var check = GetIsCheckNotation();
             var disambiguating = GetDisambiguating();
@@ -97,15 +97,15 @@ namespace ChessCore
         {
             if (_ambiguousMove == null)
                 return String.Empty;
-            else if (_ambiguousMove._startingPosition.Rank == _startingPosition.Rank)
-                return MoveUtilities.GetFileFromInt(_startingPosition.File);
+            else if (_ambiguousMove._startingCoordinate.Rank == _startingCoordinate.Rank)
+                return MoveUtilities.GetFileFromInt(_startingCoordinate.File);
             else
-                return _startingPosition.Rank.ToString();
+                return _startingCoordinate.Rank.ToString();
         }
 
         private string GetPieceNotation()
         {
-            var startingFile = MoveUtilities.GetFileFromInt(_startingPosition.File);
+            var startingFile = MoveUtilities.GetFileFromInt(_startingCoordinate.File);
             return _movedPiece is Pawn && IsCapture
                 ? startingFile
                 : _movedPiece.GetMoveRepresentation();
@@ -123,20 +123,20 @@ namespace ChessCore
         internal override NextMoveAllowedEnPassant GetAllowEnPassantOnNextMoveInfo()
         {
             return AllowEnPassantOnNextMoves()
-                ? NextMoveAllowedEnPassant.BuildAllowedMove(_endingPosition.File, _movedPiece.Color)
+                ? NextMoveAllowedEnPassant.BuildAllowedMove(_endingCoordinate.File, _movedPiece.Color)
                 : NextMoveAllowedEnPassant.BuildNotAllowedMove();
 
         }
 
-        internal override Position GetMovedPieceEndingPosition()
+        internal override SquareCoordinate GetMovedPieceEndingSquare()
         {
-            return _endingPosition;
+            return _endingCoordinate;
         }
 
         private bool AllowEnPassantOnNextMoves()
         {
             return _movedPiece is Pawn
-               && _endingPosition.GetAbsRankDifference(_startingPosition) == 2;
+               && _endingCoordinate.GetAbsRankDifference(_startingCoordinate) == 2;
         }
 
         #endregion

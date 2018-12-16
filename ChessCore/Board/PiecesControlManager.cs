@@ -9,19 +9,19 @@ namespace ChessCore
         #region Fields
 
         private readonly Board _board;
-        private readonly ISet<BoardCell> _allSquares;
-        private readonly IDictionary<Color, IDictionary<Piece, ISet<BoardCell>>> _control;
-        private readonly IDictionary<Color, ISet<BoardCell>> _controlledSquares;
-        private readonly IDictionary<Color, IList<BoardCell>> _controlCardinality;
-        private readonly IDictionary<BoardCell, ISet<Piece>> _piecesControlDict;
+        private readonly ISet<Square> _allSquares;
+        private readonly IDictionary<Color, IDictionary<Piece, ISet<Square>>> _control;
+        private readonly IDictionary<Color, ISet<Square>> _controlledSquares;
+        private readonly IDictionary<Color, IList<Square>> _controlCardinality;
+        private readonly IDictionary<Square, ISet<Piece>> _piecesControlDict;
 
         #endregion
 
         #region Constructors
 
         internal PiecesControlManager(Board board, 
-                                      IDictionary<BoardCell, ISet<Piece>> pieceControlDict,
-                                      ISet<BoardCell> allSquares)
+                                      IDictionary<Square, ISet<Piece>> pieceControlDict,
+                                      ISet<Square> allSquares)
         {
             Guard.ArgumentNotNull(board, nameof(board));
             _board = board;
@@ -44,38 +44,38 @@ namespace ChessCore
         private void AddPiece(Piece addedPiece)
         {
             var controlledSquares = addedPiece.GetControlledSquares(_board)
-                                              .Select(p => _board.GetCell(p));
+                                              .Select(p => _board.GetSquare(p));
 
-            _control[addedPiece.Color].Add(addedPiece, new HashSet<BoardCell>());
+            _control[addedPiece.Color].Add(addedPiece, new HashSet<Square>());
 
             AddNewControlledSquares(addedPiece, controlledSquares);
             ResetSquaresControl();
         }
 
-        private IDictionary<Color, IList<BoardCell>> GetControlCardinality()
+        private IDictionary<Color, IList<Square>> GetControlCardinality()
         {
-            return new Dictionary<Color, IList<BoardCell>>
+            return new Dictionary<Color, IList<Square>>
             {
-                { Color.White, new List<BoardCell>() },
-                { Color.Black, new List<BoardCell>() }
+                { Color.White, new List<Square>() },
+                { Color.Black, new List<Square>() }
             };
         }
 
-        private IDictionary<Color, IDictionary<Piece, ISet<BoardCell>>> InitControlDict()
+        private IDictionary<Color, IDictionary<Piece, ISet<Square>>> InitControlDict()
         {
-            return new Dictionary<Color, IDictionary<Piece, ISet<BoardCell>>>
+            return new Dictionary<Color, IDictionary<Piece, ISet<Square>>>
             {
-                { Color.White, new Dictionary<Piece, ISet<BoardCell>>() },
-                { Color.Black, new Dictionary<Piece, ISet<BoardCell>>() }
+                { Color.White, new Dictionary<Piece, ISet<Square>>() },
+                { Color.Black, new Dictionary<Piece, ISet<Square>>() }
             };
         }
 
-        private IDictionary<Color, ISet<BoardCell>> InitControlledSquaresDict()
+        private IDictionary<Color, ISet<Square>> InitControlledSquaresDict()
         {
-            return new Dictionary<Color, ISet<BoardCell>>
+            return new Dictionary<Color, ISet<Square>>
             {
-                { Color.White, new HashSet<BoardCell>() },
-                { Color.Black, new HashSet<BoardCell>() }
+                { Color.White, new HashSet<Square>() },
+                { Color.Black, new HashSet<Square>() }
             };
         }
 
@@ -92,14 +92,14 @@ namespace ChessCore
 
         #region Moved piece
 
-        internal ISet<Position> GetOpponentControlAfterMove(BoardCell startingPosition, BoardCell endingPosition, Color color)
+        internal ISet<SquareCoordinate> GetOpponentControlAfterMove(Square startingCoordinate, Square endingCoordinate, Color color)
         {
-            var ret = new HashSet<Position>();
+            var ret = new HashSet<SquareCoordinate>();
 
-            var opponentControllingPieces = _piecesControlDict[startingPosition]
+            var opponentControllingPieces = _piecesControlDict[startingCoordinate]
                                                 .Where(piece => piece.Color.IsOpponentColor(color));
 
-            using (_board.PlayTemporaryMove(startingPosition, endingPosition))
+            using (_board.PlayTemporaryMove(startingCoordinate, endingCoordinate))
             {
                 foreach (var piece in opponentControllingPieces)
                     ret.AddRange(piece.GetControlledSquares(_board));
@@ -108,9 +108,9 @@ namespace ChessCore
             return ret;
         }
 
-        internal ISet<Position> GetOpponentControlOnPosition(BoardCell position, Color color)
+        internal ISet<SquareCoordinate> GetOpponentControlOnPosition(Square position, Color color)
         {
-            var ret = new HashSet<Position>();
+            var ret = new HashSet<SquareCoordinate>();
 
             var allPieces = _piecesControlDict[position];
             var opponentPiecesss = allPieces.Where(piece => piece.Color.IsOpponentColor(color));
@@ -124,7 +124,7 @@ namespace ChessCore
             return ret;
         }
 
-        internal bool IsColorControllingSquare(BoardCell square, Color color)
+        internal bool IsColorControllingSquare(Square square, Color color)
         {
             return _controlledSquares[color].Contains(square);
         }
@@ -134,11 +134,11 @@ namespace ChessCore
             var colorControlList = _controlCardinality[move.MovedPiece.Color];
             var previouslyControlledSquares = _control[move.MovedPiece.Color][move.MovedPiece];
             var newControlledSquares = move.MovedPiece.GetControlledSquares(_board)
-                                                      .Select(p => _board.GetCell(p));
+                                                      .Select(p => _board.GetSquare(p));
 
             RemovePreviousControlledSquares(move.MovedPiece, previouslyControlledSquares);
             AddNewControlledSquares(move.MovedPiece, newControlledSquares);
-            if (move.StartingPosition != move.EndingPosition)
+            if (move.StartingSquare != move.EndingSquare)
                 RecalculateControlOnInterfearingPieceMoved(move);
 
             ResetSquaresControl();
@@ -147,22 +147,22 @@ namespace ChessCore
 
         private void RecalculateControlOnInterfearingPieceMoved(PieceMove move)
         {
-            var startingCell = _board.GetCell(move.StartingPosition);
-            var endingCell = _board.GetCell(move.EndingPosition);
+            var startingSquare = _board.GetSquare(move.StartingSquare);
+            var endingSquare = _board.GetSquare(move.EndingSquare);
 
-            var controllingPieces = _piecesControlDict[startingCell];
+            var controllingPieces = _piecesControlDict[startingSquare];
             foreach (var controllingPiece in controllingPieces.ToList())
-                OnPieceMoved(new PieceMove(startingCell.Position, startingCell.Position, controllingPiece, null));
+                OnPieceMoved(new PieceMove(startingSquare.Coordinate, startingSquare.Coordinate, controllingPiece, null));
 
             if (!move.IsCapture)
             {
-                controllingPieces = _piecesControlDict[endingCell];
+                controllingPieces = _piecesControlDict[endingSquare];
                 foreach (var controllingPiece in controllingPieces.ToList())
-                    OnPieceMoved(new PieceMove(endingCell.Position, endingCell.Position, controllingPiece, null));
+                    OnPieceMoved(new PieceMove(endingSquare.Coordinate, endingSquare.Coordinate, controllingPiece, null));
             }
         }
 
-        private void AddNewControlledSquares(Piece piece, IEnumerable<BoardCell> controlledSquares)
+        private void AddNewControlledSquares(Piece piece, IEnumerable<Square> controlledSquares)
         {
             _control[piece.Color][piece].AddRange(controlledSquares);
             _controlCardinality[piece.Color].AddRange(controlledSquares);
@@ -171,10 +171,10 @@ namespace ChessCore
                 _piecesControlDict[square].Add(piece);
         }
 
-        private void RemovePreviousControlledSquares(Piece piece, IEnumerable<BoardCell> previouslyControlledSquares)
+        private void RemovePreviousControlledSquares(Piece piece, IEnumerable<Square> previouslyControlledSquares)
         {
             _controlCardinality[piece.Color].RemoveRange(previouslyControlledSquares);
-            _control[piece.Color][piece] = new HashSet<BoardCell>();
+            _control[piece.Color][piece] = new HashSet<Square>();
             foreach (var square in previouslyControlledSquares)
                 _piecesControlDict[square].Remove(piece);
 
@@ -211,20 +211,20 @@ namespace ChessCore
             ResetSquaresControl();
         }
 
-        internal bool IsControlledByOppositeColor(BoardCell position, Color color)
+        internal bool IsControlledByOppositeColor(Square position, Color color)
         {
             return _controlledSquares[color.OpponentColor].Contains(position);
         }
 
         internal void PlayTemporaryMove(TemporaryMoveDisposable disp)
         {
-            var attackingOpponentPieces = _piecesControlDict[disp._startingCell]
+            var attackingOpponentPieces = _piecesControlDict[disp._startingSquare]
                 .Where(p => p.Color.IsOpponentColor(disp._movedPiece.Color));
 
             foreach(var attackingPiece in attackingOpponentPieces.ToList())
             {
                 var newControlledSquares = attackingPiece.GetControlledSquares(_board)
-                                             .Select(p => _board.GetCell(p));
+                                             .Select(p => _board.GetSquare(p));
                 var previouslyControlledSquares = _control[attackingPiece.Color][attackingPiece];
 
                 ReplateSquareInPiecesControlDict(attackingPiece, newControlledSquares, previouslyControlledSquares);
@@ -236,7 +236,7 @@ namespace ChessCore
             }
         }
 
-        private void ReplateSquareInPiecesControlDict(Piece piece, IEnumerable<BoardCell> newControlledSquares, IEnumerable<BoardCell> previouslyControlledSquares)
+        private void ReplateSquareInPiecesControlDict(Piece piece, IEnumerable<Square> newControlledSquares, IEnumerable<Square> previouslyControlledSquares)
         {
             foreach (var square in previouslyControlledSquares)
                 _piecesControlDict[square].Remove(piece);

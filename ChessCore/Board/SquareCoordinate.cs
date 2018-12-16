@@ -2,12 +2,12 @@
 
 namespace ChessCore
 {
-    public struct Position
+    public struct SquareCoordinate
     {
         public int Rank { get; }
         public int File { get; }
 
-        public Position(int rank, int file)
+        public SquareCoordinate(int rank, int file)
         {
             if (!MoveUtilities.IsValidPosition(rank, file))
                 throw new ArgumentException();
@@ -18,17 +18,17 @@ namespace ChessCore
 
         public override bool Equals(Object obj)
         {
-            return obj is Position && this == (Position)obj;
+            return obj is SquareCoordinate && this == (SquareCoordinate)obj;
         }
         public override int GetHashCode()
         {
             return Rank.GetHashCode() ^ File.GetHashCode();
         }
-        public static bool operator ==(Position x, Position y)
+        public static bool operator ==(SquareCoordinate x, SquareCoordinate y)
         {
             return x.Rank == y.Rank && x.File == y.File;
         }
-        public static bool operator !=(Position x, Position y)
+        public static bool operator !=(SquareCoordinate x, SquareCoordinate y)
         {
             return !(x == y);
         }
@@ -39,19 +39,19 @@ namespace ChessCore
             return file.ToString() + Rank;
         }
 
-        public Position AddRank(int rank)
+        public SquareCoordinate AddRank(int rank)
         {
-            return new Position(Rank + rank, File);
+            return new SquareCoordinate(Rank + rank, File);
         }
 
-        public Position AddFile(int file)
+        public SquareCoordinate AddFile(int file)
         {
-            return new Position(Rank, File + file);
+            return new SquareCoordinate(Rank, File + file);
         }
 
-        public Position AddRankAndFile(int rank, int file)
+        public SquareCoordinate AddRankAndFile(int rank, int file)
         {
-            return new Position(Rank + rank, File + file);
+            return new SquareCoordinate(Rank + rank, File + file);
         }
     }
 }

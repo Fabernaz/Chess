@@ -11,10 +11,10 @@ namespace ChessCore
     {
         #region Knight moves
 
-        internal static bool IsOnTwoOneL(this Position startingPosition, Position endingPosition)
+        internal static bool IsOnTwoOneL(this SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate)
         {
-            var rankIncrement = Math.Abs(startingPosition.Rank - endingPosition.Rank);
-            var fileIncrement = Math.Abs(startingPosition.File - endingPosition.File);
+            var rankIncrement = Math.Abs(startingCoordinate.Rank - endingCoordinate.Rank);
+            var fileIncrement = Math.Abs(startingCoordinate.File - endingCoordinate.File);
             return IsATwoOneL(rankIncrement, fileIncrement)
                 || IsATwoOneL(fileIncrement, rankIncrement);
         }
@@ -28,30 +28,30 @@ namespace ChessCore
 
         #region Rook moves
 
-        internal static bool IsOnRankOrFile(this Position startingPosition, Position endingPosition)
+        internal static bool IsOnRankOrFile(this SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate)
         {
-            return startingPosition.File == endingPosition.File
-                || startingPosition.Rank == endingPosition.Rank;
+            return startingCoordinate.File == endingCoordinate.File
+                || startingCoordinate.Rank == endingCoordinate.Rank;
         }
 
         #endregion
 
         #region Queen moves
 
-        internal static bool IsOnRankFileOrDiagonal(this Position startingPosition, Position endingPosition)
+        internal static bool IsOnRankFileOrDiagonal(this SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate)
         {
-            return startingPosition.IsOnRankOrFile(endingPosition)
-                || startingPosition.IsOnDiagonal(endingPosition);
+            return startingCoordinate.IsOnRankOrFile(endingCoordinate)
+                || startingCoordinate.IsOnDiagonal(endingCoordinate);
         }
 
         #endregion
 
         #region Bishop moves
 
-        internal static bool IsOnDiagonal(this Position startingPosition, Position endingPosition)
+        internal static bool IsOnDiagonal(this SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate)
         {
-            var rankIncrement = startingPosition.Rank - endingPosition.Rank;
-            var fileIncrement = startingPosition.File - endingPosition.File;
+            var rankIncrement = startingCoordinate.Rank - endingCoordinate.Rank;
+            var fileIncrement = startingCoordinate.File - endingCoordinate.File;
 
             if (fileIncrement == 0)
                 return false;
@@ -64,10 +64,10 @@ namespace ChessCore
 
         #region King moves
 
-        internal static bool IsKingValidMove(Position startingPosition, Position endingPosition)
+        internal static bool IsKingValidMove(SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate)
         {
-            var rankDiff = Math.Abs(startingPosition.Rank - endingPosition.Rank);
-            var fileDiff = Math.Abs(startingPosition.File - endingPosition.File);
+            var rankDiff = Math.Abs(startingCoordinate.Rank - endingCoordinate.Rank);
+            var fileDiff = Math.Abs(startingCoordinate.File - endingCoordinate.File);
 
             return (rankDiff != 0 || fileDiff != 0)
                 && (rankDiff == 1 || rankDiff == 0)
@@ -78,90 +78,90 @@ namespace ChessCore
 
         #region Pawn moves
 
-        internal static bool IsOnSameFile(this Position startingPosition, Position endingPosition)
+        internal static bool IsOnSameFile(this SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate)
         {
-            return startingPosition.File == endingPosition.File;
+            return startingCoordinate.File == endingCoordinate.File;
         }
 
-        internal static int GetRankDifference(this Position startingPosition, Position endingPosition)
+        internal static int GetRankDifference(this SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate)
         {
-            return endingPosition.Rank - startingPosition.Rank;
+            return endingCoordinate.Rank - startingCoordinate.Rank;
         }
 
-        internal static int GetAbsRankDifference(this Position startingPosition, Position endingPosition)
+        internal static int GetAbsRankDifference(this SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate)
         {
-            return Math.Abs(startingPosition.GetRankDifference(endingPosition));
+            return Math.Abs(startingCoordinate.GetRankDifference(endingCoordinate));
         }
 
-        internal static int GetFileDifference(this Position startingPosition, Position endingPosition)
+        internal static int GetFileDifference(this SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate)
         {
-            return endingPosition.File - startingPosition.File;
+            return endingCoordinate.File - startingCoordinate.File;
         }
 
-        internal static bool IsOnDiagonalAdjacentSquare(this Position startingPosition, Position endingPosition)
+        internal static bool IsOnDiagonalAdjacentSquare(this SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate)
         {
-            return Math.Abs(startingPosition.GetRankDifference(endingPosition)) == 1
-                && Math.Abs(startingPosition.GetFileDifference(endingPosition)) == 1;
+            return Math.Abs(startingCoordinate.GetRankDifference(endingCoordinate)) == 1
+                && Math.Abs(startingCoordinate.GetFileDifference(endingCoordinate)) == 1;
         }
 
         #endregion
 
         #region In between positions
 
-        internal static IEnumerable<Position> GetAllInBetweenPositions(this Position startingPosition, Position endingPosition)
+        internal static IEnumerable<SquareCoordinate> GetAllInBetweenSquares(this SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate)
         {
-            var ret = new List<Position>();
+            var ret = new List<SquareCoordinate>();
 
-            if (startingPosition.IsOnDiagonal(endingPosition))
-                Extensions.AddRange(ret, GetDiagonalInBetweenPositions(startingPosition, endingPosition));
-            if (startingPosition.IsOnRankOrFile(endingPosition))
-                Extensions.AddRange(ret, GetStraightInBetweenPosition(startingPosition, endingPosition));
+            if (startingCoordinate.IsOnDiagonal(endingCoordinate))
+                Extensions.AddRange(ret, GetDiagonalInBetweenPositions(startingCoordinate, endingCoordinate));
+            if (startingCoordinate.IsOnRankOrFile(endingCoordinate))
+                Extensions.AddRange(ret, GetStraightInBetweenPosition(startingCoordinate, endingCoordinate));
 
             return ret;
         }
 
-        private static IEnumerable<Position> GetDiagonalInBetweenPositions(Position startingPosition, Position endingPosition)
+        private static IEnumerable<SquareCoordinate> GetDiagonalInBetweenPositions(SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate)
         {
-            var ret = new List<Position>();
+            var ret = new List<SquareCoordinate>();
 
-            var shift = Math.Abs(endingPosition.Rank - startingPosition.Rank);
-            var fileDirection = Math.Sign(endingPosition.File - startingPosition.File);
-            var rankDirection = Math.Sign(endingPosition.Rank - startingPosition.Rank);
+            var shift = Math.Abs(endingCoordinate.Rank - startingCoordinate.Rank);
+            var fileDirection = Math.Sign(endingCoordinate.File - startingCoordinate.File);
+            var rankDirection = Math.Sign(endingCoordinate.Rank - startingCoordinate.Rank);
 
             for (int i = 1; i < shift; i++)
             {
-                var rank = startingPosition.Rank + (rankDirection * i);
-                var file = startingPosition.File + (fileDirection * i);
-                ret.Add(new Position(rank, file));
+                var rank = startingCoordinate.Rank + (rankDirection * i);
+                var file = startingCoordinate.File + (fileDirection * i);
+                ret.Add(new SquareCoordinate(rank, file));
             }
 
             return ret;
         }
 
-        private static IEnumerable<Position> GetStraightInBetweenPosition(Position startingPosition, Position endingPosition)
+        private static IEnumerable<SquareCoordinate> GetStraightInBetweenPosition(SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate)
         {
-            var ret = new List<Position>();
+            var ret = new List<SquareCoordinate>();
 
-            var fileShift = endingPosition.File - startingPosition.File;
+            var fileShift = endingCoordinate.File - startingCoordinate.File;
             if (fileShift != 0)
             {
                 var shiftDirection = Math.Sign(fileShift);
                 var shiftAbs = Math.Abs(fileShift);
                 for (int i = 1; i < shiftAbs; i++)
                 {
-                    var newFile = startingPosition.File + (shiftDirection * i);
-                    ret.Add(new Position(startingPosition.Rank, newFile));
+                    var newFile = startingCoordinate.File + (shiftDirection * i);
+                    ret.Add(new SquareCoordinate(startingCoordinate.Rank, newFile));
                 }
             }
             else
             {
-                var rankShift = endingPosition.Rank - startingPosition.Rank;
+                var rankShift = endingCoordinate.Rank - startingCoordinate.Rank;
                 var shiftDirection = Math.Sign(rankShift);
                 var shiftAbs = Math.Abs(rankShift);
                 for (int i = 1; i < shiftAbs; i++)
                 {
-                    var newRank = startingPosition.Rank + (shiftDirection * i);
-                    ret.Add(new Position(newRank, startingPosition.File));
+                    var newRank = startingCoordinate.Rank + (shiftDirection * i);
+                    ret.Add(new SquareCoordinate(newRank, startingCoordinate.File));
                 }
             }
 
@@ -184,7 +184,7 @@ namespace ChessCore
         private static bool CastlingNoPiecesInBetween(King king, Board board, CastleType type)
         {
             foreach (var square in king.GetCastleInBetweenPositions(type))
-                if (board.IsAnyPieceInPosition(square))
+                if (board.IsAnyPieceInSquare(square))
                     return false;
             return true;
         }
@@ -194,7 +194,7 @@ namespace ChessCore
             if (king.HasBeenMoved)
                 return false;
 
-            var rookSquare = board.GetCell(king.GetCastleRookStartingSquare(castleType));
+            var rookSquare = board.GetSquare(king.GetCastleRookStartingSquare(castleType));
             return rookSquare.Piece != null
                 && !rookSquare.Piece.HasBeenMoved;
         }
@@ -202,7 +202,7 @@ namespace ChessCore
         private static bool CastlingSquaresAreNotControlledByOpponent(King king, Board board, CastleType castleType)
         {
             foreach (var square in king.GetCastlingSquares(castleType))
-                if (board.IsInOpponentControl(board.GetCell(square), king.Color))
+                if (board.IsInOpponentControl(board.GetSquare(square), king.Color))
                     return false;
 
             return true;
@@ -210,144 +210,144 @@ namespace ChessCore
 
         #endregion
 
-        internal static IEnumerable<Position> GetDiagonalAvailability(Position startingPosition, Board board, Color pieceColor, SquareInfluenceType availabilityType)
+        internal static IEnumerable<SquareCoordinate> GetDiagonalAvailability(SquareCoordinate startingCoordinate, Board board, Color pieceColor, SquareInfluenceType availabilityType)
         {
-            var ret = new List<Position>();
+            var ret = new List<SquareCoordinate>();
 
             //Upper right diagonal
             for (int i = 1; i < 8; i++)
             {
-                var rank = startingPosition.Rank + i;
-                var file = startingPosition.File + i;
-                if (TryAddPieceGetIsLast(ret, startingPosition, rank, file, board, pieceColor, availabilityType))
+                var rank = startingCoordinate.Rank + i;
+                var file = startingCoordinate.File + i;
+                if (TryAddPieceGetIsLast(ret, startingCoordinate, rank, file, board, pieceColor, availabilityType))
                     break;
             }
             //Upper left diagonal
             for (int i = 1; i < 8; i++)
             {
-                var rank = startingPosition.Rank + i;
-                var file = startingPosition.File - i;
-                if (TryAddPieceGetIsLast(ret, startingPosition, rank, file, board, pieceColor, availabilityType))
+                var rank = startingCoordinate.Rank + i;
+                var file = startingCoordinate.File - i;
+                if (TryAddPieceGetIsLast(ret, startingCoordinate, rank, file, board, pieceColor, availabilityType))
                     break;
             }
             //Bottom right diagonal
             for (int i = 1; i < 8; i++)
             {
-                var rank = startingPosition.Rank - i;
-                var file = startingPosition.File + i;
-                if (TryAddPieceGetIsLast(ret, startingPosition, rank, file, board, pieceColor, availabilityType))
+                var rank = startingCoordinate.Rank - i;
+                var file = startingCoordinate.File + i;
+                if (TryAddPieceGetIsLast(ret, startingCoordinate, rank, file, board, pieceColor, availabilityType))
                     break;
             }
             //Bottom left diagonal
             for (int i = 1; i < 8; i++)
             {
-                var rank = startingPosition.Rank - i;
-                var file = startingPosition.File - i;
-                if (TryAddPieceGetIsLast(ret, startingPosition, rank, file, board, pieceColor, availabilityType))
+                var rank = startingCoordinate.Rank - i;
+                var file = startingCoordinate.File - i;
+                if (TryAddPieceGetIsLast(ret, startingCoordinate, rank, file, board, pieceColor, availabilityType))
                     break;
             }
 
             return ret;
         }
 
-        internal static IEnumerable<Position> GetLineAvailability(Position startingPosition, Board board, Color pieceColor, SquareInfluenceType availabilityType)
+        internal static IEnumerable<SquareCoordinate> GetLineAvailability(SquareCoordinate startingCoordinate, Board board, Color pieceColor, SquareInfluenceType availabilityType)
         {
-            var ret = new List<Position>();
+            var ret = new List<SquareCoordinate>();
 
             //Upper line
             for (int i = 1; i < 8; i++)
             {
-                var rank = startingPosition.Rank + i;
-                var file = startingPosition.File;
-                if (TryAddPieceGetIsLast(ret, startingPosition, rank, file, board, pieceColor, availabilityType))
+                var rank = startingCoordinate.Rank + i;
+                var file = startingCoordinate.File;
+                if (TryAddPieceGetIsLast(ret, startingCoordinate, rank, file, board, pieceColor, availabilityType))
                     break;
             }
             //Bottom line
             for (int i = 1; i < 8; i++)
             {
-                var rank = startingPosition.Rank - i;
-                var file = startingPosition.File;
-                if (TryAddPieceGetIsLast(ret, startingPosition, rank, file, board, pieceColor, availabilityType))
+                var rank = startingCoordinate.Rank - i;
+                var file = startingCoordinate.File;
+                if (TryAddPieceGetIsLast(ret, startingCoordinate, rank, file, board, pieceColor, availabilityType))
                     break;
             }
             //Right line
             for (int i = 1; i < 8; i++)
             {
-                var rank = startingPosition.Rank;
-                var file = startingPosition.File + i;
-                if (TryAddPieceGetIsLast(ret, startingPosition, rank, file, board, pieceColor, availabilityType))
+                var rank = startingCoordinate.Rank;
+                var file = startingCoordinate.File + i;
+                if (TryAddPieceGetIsLast(ret, startingCoordinate, rank, file, board, pieceColor, availabilityType))
                     break;
             }
             //Left line
             for (int i = 1; i < 8; i++)
             {
-                var rank = startingPosition.Rank;
-                var file = startingPosition.File - i;
-                if (TryAddPieceGetIsLast(ret, startingPosition, rank, file, board, pieceColor, availabilityType))
+                var rank = startingCoordinate.Rank;
+                var file = startingCoordinate.File - i;
+                if (TryAddPieceGetIsLast(ret, startingCoordinate, rank, file, board, pieceColor, availabilityType))
                     break;
             }
 
             return ret;
         }
 
-        internal static IEnumerable<Position> GetKingAvailability(King king, Position startingPosition, Board board, SquareInfluenceType availabilityType)
+        internal static IEnumerable<SquareCoordinate> GetKingAvailability(King king, SquareCoordinate startingCoordinate, Board board, SquareInfluenceType availabilityType)
         {
             switch (availabilityType)
             {
                 case SquareInfluenceType.Control:
-                    return GetKingControl(startingPosition);
+                    return GetKingControl(startingCoordinate);
                 case SquareInfluenceType.Mobility:
-                    return GetKingMobility(king, startingPosition, board);
+                    return GetKingMobility(king, startingCoordinate, board);
                 default:
                     throw new NotImplementedException();
             }
         }
 
-        internal static IEnumerable<Position> GetKingMobility(King king, Position startingPosition, Board board)
+        internal static IEnumerable<SquareCoordinate> GetKingMobility(King king, SquareCoordinate startingCoordinate, Board board)
         {
-            var ret = new List<Position>();
+            var ret = new List<SquareCoordinate>();
 
-            Position? newPos = null;
+            SquareCoordinate? newPos = null;
 
             //Upper left
-            if (TryGetNewPosition(startingPosition.Rank + 1, startingPosition.File - 1, out newPos))
+            if (TryGetNewPosition(startingCoordinate.Rank + 1, startingCoordinate.File - 1, out newPos))
                 if (!board.IsControlledByOppositeColor(newPos.Value, king.Color)
-                    && board.CanPieceOfColorGoToPosition(newPos.Value, king.Color))
+                    && board.CanPieceOfColorGoToSquare(newPos.Value, king.Color))
                     ret.Add(newPos.Value);
             //Upper middle
-            if (TryGetNewPosition(startingPosition.Rank + 1, startingPosition.File, out newPos))
+            if (TryGetNewPosition(startingCoordinate.Rank + 1, startingCoordinate.File, out newPos))
                 if (!board.IsControlledByOppositeColor(newPos.Value, king.Color)
-                    && board.CanPieceOfColorGoToPosition(newPos.Value, king.Color))
+                    && board.CanPieceOfColorGoToSquare(newPos.Value, king.Color))
                     ret.Add(newPos.Value);
             //Upper right
-            if (TryGetNewPosition(startingPosition.Rank + 1, startingPosition.File + 1, out newPos))
+            if (TryGetNewPosition(startingCoordinate.Rank + 1, startingCoordinate.File + 1, out newPos))
                 if (!board.IsControlledByOppositeColor(newPos.Value, king.Color)
-                    && board.CanPieceOfColorGoToPosition(newPos.Value, king.Color))
+                    && board.CanPieceOfColorGoToSquare(newPos.Value, king.Color))
                     ret.Add(newPos.Value);
             //Middle right
-            if (TryGetNewPosition(startingPosition.Rank, startingPosition.File + 1, out newPos))
+            if (TryGetNewPosition(startingCoordinate.Rank, startingCoordinate.File + 1, out newPos))
                 if (!board.IsControlledByOppositeColor(newPos.Value, king.Color)
-                    && board.CanPieceOfColorGoToPosition(newPos.Value, king.Color))
+                    && board.CanPieceOfColorGoToSquare(newPos.Value, king.Color))
                     ret.Add(newPos.Value);
             //Middle left
-            if (TryGetNewPosition(startingPosition.Rank, startingPosition.File - 1, out newPos))
+            if (TryGetNewPosition(startingCoordinate.Rank, startingCoordinate.File - 1, out newPos))
                 if (!board.IsControlledByOppositeColor(newPos.Value, king.Color)
-                    && board.CanPieceOfColorGoToPosition(newPos.Value, king.Color))
+                    && board.CanPieceOfColorGoToSquare(newPos.Value, king.Color))
                     ret.Add(newPos.Value);
             //Bottom right
-            if (TryGetNewPosition(startingPosition.Rank - 1, startingPosition.File + 1, out newPos))
+            if (TryGetNewPosition(startingCoordinate.Rank - 1, startingCoordinate.File + 1, out newPos))
                 if (!board.IsControlledByOppositeColor(newPos.Value, king.Color)
-                    && board.CanPieceOfColorGoToPosition(newPos.Value, king.Color))
+                    && board.CanPieceOfColorGoToSquare(newPos.Value, king.Color))
                     ret.Add(newPos.Value);
             //Bottom middle
-            if (TryGetNewPosition(startingPosition.Rank - 1, startingPosition.File, out newPos))
+            if (TryGetNewPosition(startingCoordinate.Rank - 1, startingCoordinate.File, out newPos))
                 if (!board.IsControlledByOppositeColor(newPos.Value, king.Color)
-                    && board.CanPieceOfColorGoToPosition(newPos.Value, king.Color))
+                    && board.CanPieceOfColorGoToSquare(newPos.Value, king.Color))
                     ret.Add(newPos.Value);
             //Bottom left
-            if (TryGetNewPosition(startingPosition.Rank - 1, startingPosition.File - 1, out newPos))
+            if (TryGetNewPosition(startingCoordinate.Rank - 1, startingCoordinate.File - 1, out newPos))
                 if (!board.IsControlledByOppositeColor(newPos.Value, king.Color)
-                    && board.CanPieceOfColorGoToPosition(newPos.Value, king.Color))
+                    && board.CanPieceOfColorGoToSquare(newPos.Value, king.Color))
                     ret.Add(newPos.Value);
 
             //King side castle
@@ -360,141 +360,141 @@ namespace ChessCore
             return ret;
         }
 
-        internal static IEnumerable<Position> GetKingControl(Position startingPosition)
+        internal static IEnumerable<SquareCoordinate> GetKingControl(SquareCoordinate startingCoordinate)
         {
-            var ret = new List<Position>();
+            var ret = new List<SquareCoordinate>();
 
-            Position? newPos = null;
+            SquareCoordinate? newPos = null;
 
             //Old square
-            ret.Add(startingPosition);
+            ret.Add(startingCoordinate);
             //Upper left
-            if (TryGetNewPosition(startingPosition.Rank + 1, startingPosition.File - 1, out newPos))
+            if (TryGetNewPosition(startingCoordinate.Rank + 1, startingCoordinate.File - 1, out newPos))
                 ret.Add(newPos.Value);
             //Upper middle
-            if (TryGetNewPosition(startingPosition.Rank + 1, startingPosition.File, out newPos))
+            if (TryGetNewPosition(startingCoordinate.Rank + 1, startingCoordinate.File, out newPos))
                 ret.Add(newPos.Value);
             //Upper right
-            if (TryGetNewPosition(startingPosition.Rank + 1, startingPosition.File + 1, out newPos))
+            if (TryGetNewPosition(startingCoordinate.Rank + 1, startingCoordinate.File + 1, out newPos))
                 ret.Add(newPos.Value);
             //Middle right
-            if (TryGetNewPosition(startingPosition.Rank, startingPosition.File + 1, out newPos))
+            if (TryGetNewPosition(startingCoordinate.Rank, startingCoordinate.File + 1, out newPos))
                 ret.Add(newPos.Value);
             //Middle left
-            if (TryGetNewPosition(startingPosition.Rank, startingPosition.File - 1, out newPos))
+            if (TryGetNewPosition(startingCoordinate.Rank, startingCoordinate.File - 1, out newPos))
                 ret.Add(newPos.Value);
             //Bottom right
-            if (TryGetNewPosition(startingPosition.Rank - 1, startingPosition.File + 1, out newPos))
+            if (TryGetNewPosition(startingCoordinate.Rank - 1, startingCoordinate.File + 1, out newPos))
                 ret.Add(newPos.Value);
             //Bottom middle
-            if (TryGetNewPosition(startingPosition.Rank - 1, startingPosition.File, out newPos))
+            if (TryGetNewPosition(startingCoordinate.Rank - 1, startingCoordinate.File, out newPos))
                 ret.Add(newPos.Value);
             //Bottom left
-            if (TryGetNewPosition(startingPosition.Rank - 1, startingPosition.File - 1, out newPos))
+            if (TryGetNewPosition(startingCoordinate.Rank - 1, startingCoordinate.File - 1, out newPos))
                 ret.Add(newPos.Value);
             return ret;
         }
 
         //TODO position factory?
-        internal static bool TryGetNewPosition(int rank, int file, out Position? position)
+        internal static bool TryGetNewPosition(int rank, int file, out SquareCoordinate? position)
         {
             var isValidPos = IsValidPosition(rank, file);
-            position = isValidPos ? new Position(rank, file) : (Position?)null;
+            position = isValidPos ? new SquareCoordinate(rank, file) : (SquareCoordinate?)null;
             return isValidPos;
         }
 
-        internal static IEnumerable<Position> GetKnightAvailability(Position startingPosition, Board board, Color pieceColor, SquareInfluenceType availabilityType)
+        internal static IEnumerable<SquareCoordinate> GetKnightAvailability(SquareCoordinate startingCoordinate, Board board, Color pieceColor, SquareInfluenceType availabilityType)
         {
-            var ret = new List<Position>();
+            var ret = new List<SquareCoordinate>();
 
             //Upper right, up
-            var rank = startingPosition.Rank + 2;
-            var file = startingPosition.File + 1;
-            TryAddSquare(ret, startingPosition, rank, file, board, pieceColor, availabilityType);
+            var rank = startingCoordinate.Rank + 2;
+            var file = startingCoordinate.File + 1;
+            TryAddSquare(ret, startingCoordinate, rank, file, board, pieceColor, availabilityType);
             //Upper right, right
-            rank = startingPosition.Rank + 1;
-            file = startingPosition.File + 2;
-            TryAddSquare(ret, startingPosition, rank, file, board, pieceColor, availabilityType);
+            rank = startingCoordinate.Rank + 1;
+            file = startingCoordinate.File + 2;
+            TryAddSquare(ret, startingCoordinate, rank, file, board, pieceColor, availabilityType);
 
             //Upper left, up
-            rank = startingPosition.Rank + 2;
-            file = startingPosition.File - 1;
-            TryAddSquare(ret, startingPosition, rank, file, board, pieceColor, availabilityType);
+            rank = startingCoordinate.Rank + 2;
+            file = startingCoordinate.File - 1;
+            TryAddSquare(ret, startingCoordinate, rank, file, board, pieceColor, availabilityType);
             //Upper left, right
-            rank = startingPosition.Rank + 1;
-            file = startingPosition.File - 2;
-            TryAddSquare(ret, startingPosition, rank, file, board, pieceColor, availabilityType);
+            rank = startingCoordinate.Rank + 1;
+            file = startingCoordinate.File - 2;
+            TryAddSquare(ret, startingCoordinate, rank, file, board, pieceColor, availabilityType);
 
             //Bottom right, bottom
-            rank = startingPosition.Rank - 2;
-            file = startingPosition.File + 1;
-            TryAddSquare(ret, startingPosition, rank, file, board, pieceColor, availabilityType);
+            rank = startingCoordinate.Rank - 2;
+            file = startingCoordinate.File + 1;
+            TryAddSquare(ret, startingCoordinate, rank, file, board, pieceColor, availabilityType);
             //Bottom right, right
-            rank = startingPosition.Rank - 1;
-            file = startingPosition.File + 2;
-            TryAddSquare(ret, startingPosition, rank, file, board, pieceColor, availabilityType);
+            rank = startingCoordinate.Rank - 1;
+            file = startingCoordinate.File + 2;
+            TryAddSquare(ret, startingCoordinate, rank, file, board, pieceColor, availabilityType);
 
             //Bottom left, bottom
-            rank = startingPosition.Rank - 2;
-            file = startingPosition.File - 1;
-            TryAddSquare(ret, startingPosition, rank, file, board, pieceColor, availabilityType);
+            rank = startingCoordinate.Rank - 2;
+            file = startingCoordinate.File - 1;
+            TryAddSquare(ret, startingCoordinate, rank, file, board, pieceColor, availabilityType);
             //Bottom left, right
-            rank = startingPosition.Rank - 1;
-            file = startingPosition.File - 2;
-            TryAddSquare(ret, startingPosition, rank, file, board, pieceColor, availabilityType);
+            rank = startingCoordinate.Rank - 1;
+            file = startingCoordinate.File - 2;
+            TryAddSquare(ret, startingCoordinate, rank, file, board, pieceColor, availabilityType);
 
             return ret;
         }
 
         #region  Pawn availability
 
-        internal static IEnumerable<Position> GetPawnAvailability(Position startingPosition, Board board, Color pieceColor, SquareInfluenceType availabilityType)
+        internal static IEnumerable<SquareCoordinate> GetPawnAvailability(SquareCoordinate startingCoordinate, Board board, Color pieceColor, SquareInfluenceType availabilityType)
         {
             switch (availabilityType)
             {
                 case SquareInfluenceType.Control:
-                    return GetPawnControl(startingPosition, board, pieceColor);
+                    return GetPawnControl(startingCoordinate, board, pieceColor);
                 case SquareInfluenceType.Mobility:
-                    return GetPawnMobility(startingPosition, board, pieceColor);
+                    return GetPawnMobility(startingCoordinate, board, pieceColor);
                 default:
                     throw new NotImplementedException();
             }
         }
 
-        internal static IEnumerable<Position> GetPawnFrontSquares(Position square, Color color)
+        internal static IEnumerable<SquareCoordinate> GetPawnFrontSquares(SquareCoordinate square, Color color)
         {
-            var ret = new List<Position>();
+            var ret = new List<SquareCoordinate>();
 
             //Left
             if (IsValidPosition(square.Rank + color.MovingDirection, square.File - 1))
-                ret.Add(new Position(square.Rank + color.MovingDirection, square.File - 1));
+                ret.Add(new SquareCoordinate(square.Rank + color.MovingDirection, square.File - 1));
 
             //In front
             if (IsValidPosition(square.Rank + color.MovingDirection, square.File))
-                ret.Add(new Position(square.Rank + color.MovingDirection, square.File));
+                ret.Add(new SquareCoordinate(square.Rank + color.MovingDirection, square.File));
 
             //Right
             if (IsValidPosition(square.Rank + color.MovingDirection, square.File + 1))
-                ret.Add(new Position(square.Rank + color.MovingDirection, square.File + 1));
+                ret.Add(new SquareCoordinate(square.Rank + color.MovingDirection, square.File + 1));
 
             return ret;
         }
 
         #region Pawn control
 
-        private static IEnumerable<Position> GetPawnControl(Position startingPosition, Board board, Color color)
+        private static IEnumerable<SquareCoordinate> GetPawnControl(SquareCoordinate startingCoordinate, Board board, Color color)
         {
-            var ret = new List<Position>();
+            var ret = new List<SquareCoordinate>();
 
-            var captureRank = startingPosition.Rank + color.MovingDirection;
-            var leftCaptureFile = startingPosition.File - 1;
-            var rightCaptureFile = startingPosition.File + 1;
+            var captureRank = startingCoordinate.Rank + color.MovingDirection;
+            var leftCaptureFile = startingCoordinate.File - 1;
+            var rightCaptureFile = startingCoordinate.File + 1;
 
             if (IsValidPosition(captureRank, leftCaptureFile))
-                ret.Add(new Position(captureRank, leftCaptureFile));
+                ret.Add(new SquareCoordinate(captureRank, leftCaptureFile));
 
             if (IsValidPosition(captureRank, rightCaptureFile))
-                ret.Add(new Position(captureRank, rightCaptureFile));
+                ret.Add(new SquareCoordinate(captureRank, rightCaptureFile));
 
             return ret;
         }
@@ -503,11 +503,11 @@ namespace ChessCore
 
         #region Pawn mobility
 
-        private static IEnumerable<Position> GetPawnMobility(Position square, Board board, Color pieceColor)
+        private static IEnumerable<SquareCoordinate> GetPawnMobility(SquareCoordinate square, Board board, Color pieceColor)
         {
-            var ret = new List<Position>();
+            var ret = new List<SquareCoordinate>();
 
-            Position? allowedSquare = null;
+            SquareCoordinate? allowedSquare = null;
 
             if (DoubleForwardMoveAllowed(board, pieceColor, square, out allowedSquare))
                 ret.Add(allowedSquare.Value);
@@ -524,7 +524,7 @@ namespace ChessCore
             return ret;
         }
 
-        private static bool EnPassantAllowed(Board board, Color color, Position square, out Position? allowedSquare)
+        private static bool EnPassantAllowed(Board board, Color color, SquareCoordinate square, out SquareCoordinate? allowedSquare)
         {
             if (square.Rank == color.EnPassantStartingRank)
             {
@@ -539,12 +539,12 @@ namespace ChessCore
 
                         if (lastMoveEnPassantInfo.IsEnPassantFile(leftCaptureFile))
                         {
-                            allowedSquare = new Position(color.EnPassantStartingRank, leftCaptureFile);
+                            allowedSquare = new SquareCoordinate(color.EnPassantStartingRank, leftCaptureFile);
                             return true;
                         }
                         else if (lastMoveEnPassantInfo.IsEnPassantFile(rightCaptureFile))
                         {
-                            allowedSquare = new Position(color.EnPassantStartingRank, rightCaptureFile);
+                            allowedSquare = new SquareCoordinate(color.EnPassantStartingRank, rightCaptureFile);
                             return true;
                         }
                     }
@@ -555,46 +555,46 @@ namespace ChessCore
             return false;
         }
 
-        private static bool IsPawnCaptureAllowed(Board board, Color color, Position square, int captureFile, out Position? allowedSquare)
+        private static bool IsPawnCaptureAllowed(Board board, Color color, SquareCoordinate square, int captureFile, out SquareCoordinate? allowedSquare)
         {
             var endingRank = square.Rank + color.MovingDirection;
 
             var isAllowed = IsValidPosition(square.Rank, captureFile)
-                         && board.IsAnyPieceOfDifferentColorInPosition(new Position(endingRank, captureFile), color);
+                         && board.IsAnyOpponentPieceInSquare(new SquareCoordinate(endingRank, captureFile), color);
 
             allowedSquare = isAllowed
-                ? new Position(endingRank, captureFile)
-                : (Position?)null;
+                ? new SquareCoordinate(endingRank, captureFile)
+                : (SquareCoordinate?)null;
 
             return isAllowed;
         }
 
-        private static bool DoubleForwardMoveAllowed(Board board, Color color, Position square, out Position? allowedSquare)
+        private static bool DoubleForwardMoveAllowed(Board board, Color color, SquareCoordinate square, out SquareCoordinate? allowedSquare)
         {
             var singleRankMove = square.Rank + color.MovingDirection;
             var doubleRankMove = square.Rank + color.MovingDirection * 2;
 
             var isAllowed = square.Rank == color.PawnFirstRank
-                && !board.IsAnyPieceInPosition(singleRankMove, square.File)
-                && !board.IsAnyPieceInPosition(doubleRankMove, square.File);
+                && !board.IsAnyPieceInSquare(singleRankMove, square.File)
+                && !board.IsAnyPieceInSquare(doubleRankMove, square.File);
 
             allowedSquare = isAllowed
-                ? new Position(doubleRankMove, square.File)
-                : (Position?)null;
+                ? new SquareCoordinate(doubleRankMove, square.File)
+                : (SquareCoordinate?)null;
 
             return isAllowed;
         }
 
-        private static bool SingleForwardMoveAllowed(Board board, Color color, Position square, out Position? allowedSquare)
+        private static bool SingleForwardMoveAllowed(Board board, Color color, SquareCoordinate square, out SquareCoordinate? allowedSquare)
         {
             var singleRankMove = square.Rank + color.MovingDirection;
 
-            var isAllowed = !board.IsAnyPieceInPosition(singleRankMove, square.File)
+            var isAllowed = !board.IsAnyPieceInSquare(singleRankMove, square.File)
                          && IsValidPosition(singleRankMove, square.File);
 
             allowedSquare = isAllowed
-                ? new Position(singleRankMove, square.File)
-                : (Position?)null;
+                ? new SquareCoordinate(singleRankMove, square.File)
+                : (SquareCoordinate?)null;
 
             return isAllowed;
         }
@@ -603,8 +603,8 @@ namespace ChessCore
 
         #endregion
 
-        private static bool TryAddPieceGetIsLast(List<Position> ret,
-                                                 Position startingSquare,
+        private static bool TryAddPieceGetIsLast(List<SquareCoordinate> ret,
+                                                 SquareCoordinate startingSquare,
                                                  int newRank,
                                                  int newFile,
                                                  Board board,
@@ -616,11 +616,11 @@ namespace ChessCore
 
             TryAddSquare(ret, startingSquare, newRank, newFile, board, pieceColor, availabilityType);
 
-            return board.IsAnyPieceInPosition(new Position(newRank, newFile));
+            return board.IsAnyPieceInSquare(new SquareCoordinate(newRank, newFile));
         }
 
-        private static void TryAddSquare(List<Position> ret,
-                                         Position startingSquare,
+        private static void TryAddSquare(List<SquareCoordinate> ret,
+                                         SquareCoordinate startingSquare,
                                          int newRank,
                                          int newFile,
                                          Board board,
@@ -630,7 +630,7 @@ namespace ChessCore
             if (!IsValidPosition(newRank, newFile))
                 return;
 
-            var newSquare = new Position(newRank, newFile);
+            var newSquare = new SquareCoordinate(newRank, newFile);
 
             switch (availabilityType)
             {
@@ -646,9 +646,9 @@ namespace ChessCore
             }
         }
 
-        private static bool IsInPieceMobility(Board board, Position startingSquare, Position endingSquare, Color color)
+        private static bool IsInPieceMobility(Board board, SquareCoordinate startingSquare, SquareCoordinate endingSquare, Color color)
         {
-            return board.CanPieceOfColorGoToPosition(endingSquare, color);
+            return board.CanPieceOfColorGoToSquare(endingSquare, color);
         }
 
         #endregion

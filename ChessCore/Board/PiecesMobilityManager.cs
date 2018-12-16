@@ -10,19 +10,19 @@ namespace ChessCore
     {
         #region Fields
 
-        private readonly IDictionary<Pawn, ISet<Position>> _pawnsFrontSquaresDict;
-        private readonly IDictionary<Position, ISet<Pawn>> _squaresControlledByPawnDict;
+        private readonly IDictionary<Pawn, ISet<SquareCoordinate>> _pawnsFrontSquaresDict;
+        private readonly IDictionary<SquareCoordinate, ISet<Pawn>> _squaresControlledByPawnDict;
         private readonly Board _board;
-        private readonly ISet<BoardCell> _allSquares;
-        private readonly IDictionary<BoardCell, ISet<Piece>> _piecesControlDict;
+        private readonly ISet<Square> _allSquares;
+        private readonly IDictionary<Square, ISet<Piece>> _piecesControlDict;
 
         #endregion
 
         #region Constructors
 
         public PiecesMobilityManager(Board board,
-                                     IDictionary<BoardCell, ISet<Piece>> pieceControlDict,
-                                     ISet<BoardCell> allSquares)
+                                     IDictionary<Square, ISet<Piece>> pieceControlDict,
+                                     ISet<Square> allSquares)
         {
             Guard.ArgumentNotNull(board, nameof(board));
             _board = board;
@@ -39,17 +39,17 @@ namespace ChessCore
 
         #region Init
 
-        private IDictionary<Pawn, ISet<Position>> InitPawnFrontSquaresDict()
+        private IDictionary<Pawn, ISet<SquareCoordinate>> InitPawnFrontSquaresDict()
         {
-            return new Dictionary<Pawn, ISet<Position>>();
+            return new Dictionary<Pawn, ISet<SquareCoordinate>>();
         }
 
-        private IDictionary<Position, ISet<Pawn>> InitSquareControlledByPawnDict()
+        private IDictionary<SquareCoordinate, ISet<Pawn>> InitSquareControlledByPawnDict()
         {
-            var ret = new Dictionary<Position, ISet<Pawn>>();
+            var ret = new Dictionary<SquareCoordinate, ISet<Pawn>>();
 
             foreach (var square in _allSquares)
-                ret.Add(square.Position, new HashSet<Pawn>());
+                ret.Add(square.Coordinate, new HashSet<Pawn>());
 
             return ret;
         }
@@ -69,7 +69,7 @@ namespace ChessCore
         private void OnPieceAdded(Piece addedPiece)
         {
             if (addedPiece is Pawn)
-                _pawnsFrontSquaresDict.Add(addedPiece as Pawn, new HashSet<Position>());
+                _pawnsFrontSquaresDict.Add(addedPiece as Pawn, new HashSet<SquareCoordinate>());
         }
 
         private void SetAllPiecesMobility(IEnumerable<Piece> pieces)
@@ -86,17 +86,17 @@ namespace ChessCore
         {
             foreach (var move in moveOperations.MovedPieces)
                 ResetPiecesMobility(move.MovedPiece,
-                                    _board.GetCell(move.StartingPosition),
-                                    _board.GetCell(move.EndingPosition));
+                                    _board.GetSquare(move.StartingSquare),
+                                    _board.GetSquare(move.EndingSquare));
         }
 
         #endregion
 
         #region Mobility
 
-        private void ResetPiecesMobility(Piece movedPiece, BoardCell startingSquare, BoardCell endingSquare)
+        private void ResetPiecesMobility(Piece movedPiece, Square startingSquare, Square endingSquare)
         {
-            HandlePawnMobility(movedPiece, startingSquare.Position, endingSquare.Position);
+            HandlePawnMobility(movedPiece, startingSquare.Coordinate, endingSquare.Coordinate);
             ResetKingMobility();
             ResetPieceMobility(movedPiece, startingSquare, endingSquare);
         }
@@ -107,7 +107,7 @@ namespace ChessCore
             _board.GetKing(Color.Black).ResetAvailableMoves(_board);
         }
 
-        private void ResetPieceMobility(Piece movedPiece, BoardCell startingSquare, BoardCell endingSquare)
+        private void ResetPieceMobility(Piece movedPiece, Square startingSquare, Square endingSquare)
         {
             var allInfluencedPieces = new List<Piece>();
 
@@ -120,13 +120,13 @@ namespace ChessCore
                 .Where(p => !p.Equals(movedPiece));
             allInfluencedPieces.AddRange(piecesControllingMovingSquares);
 
-            var attackedPieces = newAvailableMoves.Select(p => _board.GetCell(p))
+            var attackedPieces = newAvailableMoves.Select(p => _board.GetSquare(p))
                                            .Where(p => p.ContainsPiece())
                                            .Where(p => p.Piece.Color.IsOpponentColor(movedPiece.Color))
                                            .Select(p => p.Piece);
             allInfluencedPieces.AddRange(attackedPieces);
 
-            var previouslyAttackedPieces = previouslyAvailableMoves.Select(p => _board.GetCell(p))
+            var previouslyAttackedPieces = previouslyAvailableMoves.Select(p => _board.GetSquare(p))
                                            .Where(p => p.ContainsPiece())
                                            .Where(p => p.Piece.Color.IsOpponentColor(movedPiece.Color))
                                            .Select(p => p.Piece);
@@ -136,13 +136,13 @@ namespace ChessCore
                 attackedPiece.ResetAvailableMoves(_board);
         }
 
-        private void HandlePawnMobility(Piece piece, params Position[] squares)
+        private void HandlePawnMobility(Piece piece, params SquareCoordinate[] squares)
         {
             ResetPawnFrontSquares(piece);
             ResetPawnMobility(squares);
         }
 
-        private void ResetPawnMobility(params Position[] squares)
+        private void ResetPawnMobility(params SquareCoordinate[] squares)
         {
             var influencedPawns = new List<Pawn>();
             foreach (var square in squares)

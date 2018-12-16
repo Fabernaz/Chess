@@ -10,10 +10,10 @@ namespace ChessCore
     {
         private readonly King _king;
         private readonly Rook _rook;
-        private readonly Position _kingStartingPosition;
-        private readonly Position _kingEndingPosition;
-        private readonly Position _rookStartingPosition;
-        private readonly Position _rookEndingPosition;
+        private readonly SquareCoordinate _kingStartingPosition;
+        private readonly SquareCoordinate _kingEndingPosition;
+        private readonly SquareCoordinate _rookStartingPosition;
+        private readonly SquareCoordinate _rookEndingPosition;
 
         public CastlingQueenSide(King king, Rook rook)
             : base(true)
@@ -32,7 +32,7 @@ namespace ChessCore
             return new PiecesAffectedByMove(_king, null, _rook);
         }
 
-        internal override Position GetMovedPieceEndingPosition()
+        internal override SquareCoordinate GetMovedPieceEndingSquare()
         {
             return _king.GetCastleEndingPosition(CastleType.QueenSide);
         }

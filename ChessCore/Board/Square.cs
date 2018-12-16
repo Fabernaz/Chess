@@ -2,7 +2,7 @@
 
 namespace ChessCore
 {
-    public class BoardCell : Model
+    public class Square
     {
         private Piece _piece;
         private bool _isControlledByBlack;
@@ -10,7 +10,7 @@ namespace ChessCore
 
         public BoardCellColor Color { get; }
 
-        public Position Position { get; }
+        public SquareCoordinate Coordinate { get; }
 
         public bool IsControlledByWhite
         {
@@ -52,26 +52,26 @@ namespace ChessCore
         public event EventHandler ControlledByWhiteChanged;
         public event EventHandler ControlledByBlackChanged;
 
-        public BoardCell(Position position)
+        public Square(SquareCoordinate position)
         {
-            Position = position;
+            Coordinate = position;
             Color = GetColor();
         }
 
         private BoardCellColor GetColor()
         {
-            return (Position.Rank - Position.File) % 2 == 0 ?
+            return (Coordinate.Rank - Coordinate.File) % 2 == 0 ?
                         BoardCellColor.Dark :
                         BoardCellColor.Light;
         }
 
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is BoardCell))
+            if (obj == null || !(obj is Square))
                 return false;
 
-            var valObj = obj as BoardCell;
-            return valObj.Position == Position;
+            var valObj = obj as Square;
+            return valObj.Coordinate == Coordinate;
         }
 
         public bool ContainsPiece()
@@ -79,7 +79,7 @@ namespace ChessCore
             return Piece != null;
         }
 
-        public bool ContainsPieceOfDifferentColor(Color color)
+        public bool ContainsOpponentPiece(Color color)
         {
             return ContainsPiece()
                 && Piece.Color.IsOpponentColor(color);
@@ -87,7 +87,7 @@ namespace ChessCore
 
         public override int GetHashCode()
         {
-            return Position.GetHashCode();
+            return Coordinate.GetHashCode();
         }
     }
 }

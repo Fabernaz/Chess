@@ -15,7 +15,7 @@ namespace ChessCore
 
         public PiecesInfluenceManager(Board board)
         {
-            var allSquares = new HashSet<BoardCell>(board.GetAllBoardSquares());
+            var allSquares = new HashSet<Square>(board.GetAllBoardSquares());
             var pieceControlDict = GetPieceControlDict(allSquares);
 
             _controlManager = new PiecesControlManager(board, pieceControlDict, allSquares);
@@ -26,9 +26,9 @@ namespace ChessCore
 
         #region Init
 
-        private IDictionary<BoardCell, ISet<Piece>> GetPieceControlDict(ISet<BoardCell> allSquares)
+        private IDictionary<Square, ISet<Piece>> GetPieceControlDict(ISet<Square> allSquares)
         {
-            var ret = new Dictionary<BoardCell, ISet<Piece>>();
+            var ret = new Dictionary<Square, ISet<Piece>>();
 
             foreach (var square in allSquares)
                 ret.Add(square, new HashSet<Piece>());
@@ -60,22 +60,22 @@ namespace ChessCore
 
         #region Control methods
 
-        internal bool IsControlledByOppositeColor(BoardCell position, Color color)
+        internal bool IsControlledByOppositeColor(Square position, Color color)
         {
             return _controlManager.IsControlledByOppositeColor(position, color);
         }
 
-        internal ISet<Position> GetOpponentControlAfterMove(BoardCell startingPosition, BoardCell endingPosition, Color color)
+        internal ISet<SquareCoordinate> GetOpponentControlAfterMove(Square startingCoordinate, Square endingCoordinate, Color color)
         {
-            return _controlManager.GetOpponentControlAfterMove(startingPosition, endingPosition, color);
+            return _controlManager.GetOpponentControlAfterMove(startingCoordinate, endingCoordinate, color);
         }
 
-        internal ISet<Position> GetOpponentControlOnPosition(BoardCell position, Color color)
+        internal ISet<SquareCoordinate> GetOpponentControlOnSquare(Square position, Color color)
         {
             return _controlManager.GetOpponentControlOnPosition(position, color);
         }
 
-        internal bool IsColorControllingSquare(BoardCell square, Color color)
+        internal bool IsColorControllingSquare(Square square, Color color)
         {
             return _controlManager.IsColorControllingSquare(square, color);
         }

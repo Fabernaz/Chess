@@ -41,7 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Board\BoardCell.cs" />
+    <Compile Include="Board\Square.cs" />
     <Compile Include="Board\Board.cs" />
     <Compile Include="Board\BoardFactory.cs" />
     <Compile Include="Board\PiecesInfluenceManager.cs" />
@@ -49,7 +49,6 @@
     <Compile Include="Board\PiecesControlManager.cs" />
     <Compile Include="Color\Color.cs" />
     <Compile Include="Enums.cs" />
-    <Compile Include="Model.cs" />
     <Compile Include="Moves\MoveTypes\CastlingKingSide.cs" />
     <Compile Include="Moves\MoveTypes\CastlingQueenSide.cs" />
     <Compile Include="Moves\MoveTypes\EnPassant.cs" />
@@ -59,7 +58,7 @@
     <Compile Include="Moves\MovePair.cs" />
     <Compile Include="Moves\MovesSet.cs" />
     <Compile Include="Moves\MovesUtilities.cs" />
-    <Compile Include="Moves\MoveTypes\GenericMove.cs" />
+    <Compile Include="Moves\MoveTypes\Move.cs" />
     <Compile Include="Pieces\Factories\IStartingPiecesSetFactory.cs" />
     <Compile Include="Pieces\Factories\TestStartingPiecesFactory.cs" />
     <Compile Include="Pieces\King.cs" />
@@ -70,7 +69,7 @@
     <Compile Include="Pieces\Piece.cs" />
     <Compile Include="Pieces\Queen.cs" />
     <Compile Include="Pieces\Rook.cs" />
-    <Compile Include="Board\Position.cs" />
+    <Compile Include="Board\SquareCoordinate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resource.Designer.cs">
       <AutoGen>True</AutoGen>

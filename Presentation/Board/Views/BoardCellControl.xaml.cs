@@ -22,7 +22,7 @@ namespace Presentation
         private readonly BoardCellVM _vm;
         private readonly BoardVM _board;
 
-        public Position Position { get; }
+        public SquareCoordinate Position { get; }
 
         public BoardCellControl(BoardCellVM vm)
         {

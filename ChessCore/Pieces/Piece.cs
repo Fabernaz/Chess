@@ -4,17 +4,17 @@ using System.Linq;
 
 namespace ChessCore
 {
-    public abstract class Piece : Model
+    public abstract class Piece
     {
         //Never concretize this collection, LINQ deferred execution ensures that not-in-check 
         //moves are calculated after black move
-        protected IEnumerable<Position> _availableMoves;
+        protected IEnumerable<SquareCoordinate> _availableMoves;
 
         public Color Color { get; }
 
-        public Position? Position { get; set; }
+        public SquareCoordinate? CurrentCoordinate { get; set; }
 
-        public bool IsBeenCaptured { get { return Position != null; } }
+        public bool IsBeenCaptured { get { return CurrentCoordinate != null; } }
 
         public Uri ImageUri { get; }
 
@@ -22,24 +22,24 @@ namespace ChessCore
 
         public abstract bool CanPin { get; }
 
-        public abstract bool IsPieceMove(Position startingPosition, Position endingPosition, Piece capturedPiece);
+        public abstract bool IsPieceMove(SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece capturedPiece);
 
-        public void OnPieceMoved(Position newPosition)
+        public void OnPieceMoved(SquareCoordinate newPosition)
         {
             HasBeenMoved = true;
-            Position = newPosition;
+            CurrentCoordinate = newPosition;
         }
 
         public void OnPieceCaptured()
         {
-            Position = null;
+            CurrentCoordinate = null;
             _availableMoves = null;
         }
 
-        public Piece(Color color, Position position)
+        public Piece(Color color, SquareCoordinate position)
         {
             Color = color;
-            Position = position;
+            CurrentCoordinate = position;
             ImageUri = GetImageUri();
         }
 
@@ -53,43 +53,43 @@ namespace ChessCore
             return base.MemberwiseClone();
         }
 
-        protected abstract IEnumerable<Position> GetNewControlledSquares(Board board);
+        protected abstract IEnumerable<SquareCoordinate> GetNewControlledSquares(Board board);
 
         public abstract string GetMoveRepresentation();
 
         //TODO: this is presentation logic!!
         protected abstract Uri GetImageUri();
 
-        public IEnumerable<Position> GetAvailableMoves()
+        public IEnumerable<SquareCoordinate> GetAvailableMoves()
         {
             return _availableMoves;
         }
 
         public IEnumerable<Piece> GetAttackedPieces(Board board)
         {
-            return _availableMoves.Where(p => board.IsAnyPieceOfDifferentColorInPosition(p, Color))
-                                  .Select(p => board.GetCell(p).Piece);
+            return _availableMoves.Where(p => board.IsAnyOpponentPieceInSquare(p, Color))
+                                  .Select(p => board.GetSquare(p).Piece);
         }
 
         internal void ResetAvailableMoves(Board board)
         {
-            _availableMoves = Position.HasValue
+            _availableMoves = CurrentCoordinate.HasValue
                 ? GetAvailableMoves(board)
-                         .Where(s => !board.WouldBeInCheckAfterMove(board.GetCell(Position.Value), board.GetCell(s)))
-                : new List<Position>();
+                         .Where(s => !board.WouldBeInCheckAfterMove(board.GetSquare(CurrentCoordinate.Value), board.GetSquare(s)))
+                : new List<SquareCoordinate>();
         }
 
         //Never concretize this collection, LINQ deferred execution ensures that not-in-check 
         //moves are calculated after black move
-        internal IEnumerable<Position> GetControlledSquares(Board board)
+        internal IEnumerable<SquareCoordinate> GetControlledSquares(Board board)
         {
-            return Position.HasValue
+            return CurrentCoordinate.HasValue
                 ? GetNewControlledSquares(board)
-                : new List<Position>();
+                : new List<SquareCoordinate>();
         }
 
         //Never concretize this collection, LINQ deferred execution ensures that not-in-check 
         //moves are calculated after black move
-        protected abstract IEnumerable<Position> GetAvailableMoves(Board board);
+        protected abstract IEnumerable<SquareCoordinate> GetAvailableMoves(Board board);
     }
 }

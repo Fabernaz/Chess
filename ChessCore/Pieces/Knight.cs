@@ -8,25 +8,25 @@ namespace ChessCore
     {
         public override bool CanPin => false;
 
-        public Knight(Color color, Position position)
+        public Knight(Color color, SquareCoordinate position)
             : base(color, position)
         {}
 
-        protected override IEnumerable<Position> GetAvailableMoves(Board board)
+        protected override IEnumerable<SquareCoordinate> GetAvailableMoves(Board board)
         {
-            return MoveUtilities.GetKnightAvailability(Position.Value, board, Color, SquareInfluenceType.Mobility)
+            return MoveUtilities.GetKnightAvailability(CurrentCoordinate.Value, board, Color, SquareInfluenceType.Mobility)
                 ;
         }
 
-        protected override IEnumerable<Position> GetNewControlledSquares(Board board)
+        protected override IEnumerable<SquareCoordinate> GetNewControlledSquares(Board board)
         {
-            return MoveUtilities.GetKnightAvailability(Position.Value, board, Color, SquareInfluenceType.Control)
+            return MoveUtilities.GetKnightAvailability(CurrentCoordinate.Value, board, Color, SquareInfluenceType.Control)
                 ;
         }
 
-        public override bool IsPieceMove(Position startingPosition, Position endingPosition, Piece capturedPiece)
+        public override bool IsPieceMove(SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece capturedPiece)
         {
-            return MoveUtilities.IsOnTwoOneL(startingPosition, endingPosition);
+            return MoveUtilities.IsOnTwoOneL(startingCoordinate, endingCoordinate);
         }
 
         public override bool CanJumpOverPieces()

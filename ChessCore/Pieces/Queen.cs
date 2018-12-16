@@ -9,25 +9,25 @@ namespace ChessCore
     {
         public override bool CanPin => true;
 
-        public Queen(Color color, Position position)
+        public Queen(Color color, SquareCoordinate position)
             :base(color, position)
         { }
 
-        protected override IEnumerable<Position> GetAvailableMoves(Board board)
+        protected override IEnumerable<SquareCoordinate> GetAvailableMoves(Board board)
         {
-            return MoveUtilities.GetDiagonalAvailability(Position.Value, board, Color, SquareInfluenceType.Mobility)
-              .Concat(MoveUtilities.GetLineAvailability(Position.Value, board, Color, SquareInfluenceType.Mobility));
+            return MoveUtilities.GetDiagonalAvailability(CurrentCoordinate.Value, board, Color, SquareInfluenceType.Mobility)
+              .Concat(MoveUtilities.GetLineAvailability(CurrentCoordinate.Value, board, Color, SquareInfluenceType.Mobility));
         }
 
-        protected override IEnumerable<Position> GetNewControlledSquares(Board board)
+        protected override IEnumerable<SquareCoordinate> GetNewControlledSquares(Board board)
         {
-            return MoveUtilities.GetDiagonalAvailability(Position.Value, board, Color, SquareInfluenceType.Control)
-              .Concat(MoveUtilities.GetLineAvailability(Position.Value, board, Color, SquareInfluenceType.Control));
+            return MoveUtilities.GetDiagonalAvailability(CurrentCoordinate.Value, board, Color, SquareInfluenceType.Control)
+              .Concat(MoveUtilities.GetLineAvailability(CurrentCoordinate.Value, board, Color, SquareInfluenceType.Control));
         }
 
-        public override bool IsPieceMove(Position startingPosition, Position endingPosition, Piece capturedPiece)
+        public override bool IsPieceMove(SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece capturedPiece)
         {
-            return startingPosition.IsOnRankFileOrDiagonal(endingPosition);
+            return startingCoordinate.IsOnRankFileOrDiagonal(endingCoordinate);
         }
 
         protected override Uri GetImageUri()

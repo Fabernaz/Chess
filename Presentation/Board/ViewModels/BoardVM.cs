@@ -24,7 +24,7 @@ namespace Presentation
         public BoardVM(Board model)
             : base(model)
         {
-            Cells = model.GetBoardCells()
+            Cells = model.GetSquares()
                          .Select(m => new BoardCellVM(m, this))
                          .ToList(); //This is to end deferred execution
         }

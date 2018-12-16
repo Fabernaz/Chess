@@ -5,7 +5,7 @@ using ReactiveUI;
 
 namespace Presentation
 {
-    public class BoardCellVM : ReactiveModelViewModelBase<BoardCell>
+    public class BoardCellVM : ReactiveModelViewModelBase<Square>
     {
         private bool _movingPiece;
         private bool _dioBoia;
@@ -14,7 +14,7 @@ namespace Presentation
 
         public BoardVM Board { get; }
 
-        public Position Position { get { return Model.Position; } }
+        public SquareCoordinate Position { get { return Model.Coordinate; } }
 
         public bool IsControlledByWhite { get { return Model.IsControlledByWhite; } }
 
@@ -34,7 +34,7 @@ namespace Presentation
             set { this.RaiseAndSetIfChanged(ref _movingPiece, value); }
         }
 
-        public BoardCellVM(BoardCell model, BoardVM board)
+        public BoardCellVM(Square model, BoardVM board)
             : base(model)
         {
             Board = board;

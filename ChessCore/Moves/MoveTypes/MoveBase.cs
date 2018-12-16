@@ -29,7 +29,7 @@ namespace ChessCore
 
         internal abstract PiecesAffectedByMove GetAffectedPieces();
 
-        internal abstract Position GetMovedPieceEndingPosition();
+        internal abstract SquareCoordinate GetMovedPieceEndingSquare();
 
         internal virtual NextMoveAllowedEnPassant GetAllowEnPassantOnNextMoveInfo()
         {

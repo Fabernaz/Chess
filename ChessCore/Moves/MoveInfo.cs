@@ -2,19 +2,19 @@
 {
     internal class PieceMove
     {
-        internal Position EndingPosition { get; }
-        internal Position StartingPosition { get; }
+        internal SquareCoordinate EndingSquare { get; }
+        internal SquareCoordinate StartingSquare { get; }
         internal Piece MovedPiece { get; }
         internal Piece CapturedPiece { get; }
         internal bool IsCapture { get { return CapturedPiece != null; } }
 
-        internal PieceMove(Position startingPosition, 
-                           Position endingPosition,
+        internal PieceMove(SquareCoordinate startingCoordinate, 
+                           SquareCoordinate endingCoordinate,
                            Piece movedPiece,
                            Piece capturedPiece)
         {
-            StartingPosition = startingPosition;
-            EndingPosition = endingPosition;
+            StartingSquare = startingCoordinate;
+            EndingSquare = endingCoordinate;
             MovedPiece = movedPiece;
             CapturedPiece = capturedPiece;
         }

@@ -11,20 +11,20 @@ namespace ChessCore
         #region Fields
 
         private readonly Pawn _movedPawn;
-        private readonly Position _startingMovedPawnPosition;
-        private readonly Position _endingMovedPawnPosition;
+        private readonly SquareCoordinate _startingMovedPawnPosition;
+        private readonly SquareCoordinate _endingMovedPawnPosition;
         private readonly Pawn _capturedPawn;
-        private readonly Position _capturedPawnPosition;
+        private readonly SquareCoordinate _capturedPawnPosition;
 
         #endregion
 
         #region Constructors
 
         internal EnPassant(Pawn movedPawn,
-                           Position startingMovedPawnPosition,
-                           Position endingMovedPawnPosition,
+                           SquareCoordinate startingMovedPawnPosition,
+                           SquareCoordinate endingMovedPawnPosition,
                            Pawn capturedPawn,
-                           Position capturedPawnPosition)
+                           SquareCoordinate capturedPawnPosition)
             : base(true)
         {
             _movedPawn = movedPawn;
@@ -78,7 +78,7 @@ namespace ChessCore
             return ret;
         }
 
-        internal override Position GetMovedPieceEndingPosition()
+        internal override SquareCoordinate GetMovedPieceEndingSquare()
         {
             return _endingMovedPawnPosition;
         }

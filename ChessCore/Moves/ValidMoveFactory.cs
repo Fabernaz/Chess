@@ -8,46 +8,46 @@ namespace ChessCore
 {
     internal class ValidMoveFactory
     {
-        internal bool TryCreateValidMove(BoardCell startingCell,
-                                         BoardCell endingCell,
+        internal bool TryCreateValidMove(Square startingSquare,
+                                         Square endingSquare,
                                          Board board,
                                          out MoveBase move)
         {
-            return TryEnPassant(startingCell, endingCell, board, out move)
-                || TryCastle(board, startingCell, endingCell, out move)
-                || TryGenericMove(startingCell, endingCell, board, out move);
+            return TryEnPassant(startingSquare, endingSquare, board, out move)
+                || TryCastle(board, startingSquare, endingSquare, out move)
+                || TryGenericMove(startingSquare, endingSquare, board, out move);
         }
 
         #region En passant
 
-        private MoveBase GetEnPassantMove(BoardCell startingCell,
-                                          BoardCell endingCell,
+        private MoveBase GetEnPassantMove(Square startingSquare,
+                                          Square endingSquare,
                                           Board board)
         {
-            return new EnPassant(startingCell.Piece as Pawn,
-                                 startingCell.Position,
-                                 endingCell.Position,
+            return new EnPassant(startingSquare.Piece as Pawn,
+                                 startingSquare.Coordinate,
+                                 endingSquare.Coordinate,
                                  board.GetLastMovedPiece() as Pawn,
-                                 board.GetLastMove().GetMovedPieceEndingPosition());
+                                 board.GetLastMove().GetMovedPieceEndingSquare());
         }
 
-        private bool TryEnPassant(BoardCell startingCell,
-                                  BoardCell endingCell,
+        private bool TryEnPassant(Square startingSquare,
+                                  Square endingSquare,
                                   Board board,
                                   out MoveBase move)
         {
             move = null;
-            var isValid = GetIsValidEnPassantMove(startingCell, endingCell, board);
+            var isValid = GetIsValidEnPassantMove(startingSquare, endingSquare, board);
             if (isValid)
-                move = GetEnPassantMove(startingCell, endingCell, board);
+                move = GetEnPassantMove(startingSquare, endingSquare, board);
             return isValid;
         }
 
-        private bool GetIsValidEnPassantMove(BoardCell startingCell,
-                                             BoardCell endingCell,
+        private bool GetIsValidEnPassantMove(Square startingSquare,
+                                             Square endingSquare,
                                              Board board)
         {
-            if (!(startingCell.Piece is Pawn))
+            if (!(startingSquare.Piece is Pawn))
                 return false;
 
             var lastMove = board.GetLastMove();
@@ -58,45 +58,45 @@ namespace ChessCore
             if (!lastMoveEnPassantInfo.IsAllowed)
                 return false;
 
-            return lastMoveEnPassantInfo.IsEnPassantRankAndFile(startingCell.Piece.Color,
-                                                                startingCell.Position.Rank,
-                                                                endingCell.Position.Rank,
-                                                                startingCell.Position.File,
-                                                                endingCell.Position.File);
+            return lastMoveEnPassantInfo.IsEnPassantRankAndFile(startingSquare.Piece.Color,
+                                                                startingSquare.Coordinate.Rank,
+                                                                endingSquare.Coordinate.Rank,
+                                                                startingSquare.Coordinate.File,
+                                                                endingSquare.Coordinate.File);
         }
 
         #endregion
 
         #region Castling
 
-        private bool TryCastle(Board board, BoardCell startingCell, BoardCell endingCell, out MoveBase move)
+        private bool TryCastle(Board board, Square startingSquare, Square endingSquare, out MoveBase move)
         {
             move = null;
             CastleType? castleType = null;
             King king = null;
 
-            var isValid = GetIsValidCastleMove(board, startingCell, endingCell, out castleType, out king);
+            var isValid = GetIsValidCastleMove(board, startingSquare, endingSquare, out castleType, out king);
             if (isValid)
                 move = GetCastleMove(board, castleType.Value, king);
 
             return isValid;
         }
 
-        private bool GetIsValidCastleMove(Board board, BoardCell startingCell, BoardCell endingCell, out CastleType? castleType, out King king)
+        private bool GetIsValidCastleMove(Board board, Square startingSquare, Square endingSquare, out CastleType? castleType, out King king)
         {
             castleType = null;
 
-            king = startingCell.Piece as King;
+            king = startingSquare.Piece as King;
             if (king == null)
                 return false;
 
-            return IsCastleMove(king, startingCell, endingCell, out castleType)
+            return IsCastleMove(king, startingSquare, endingSquare, out castleType)
                 && MoveUtilities.CanCastle(king, board, castleType.Value);
         }
 
         private MoveBase GetCastleMove(Board board, CastleType castleType, King king)
         {
-            var rook = board.GetCell(king.GetCastleRookStartingSquare(castleType)).Piece as Rook;
+            var rook = board.GetSquare(king.GetCastleRookStartingSquare(castleType)).Piece as Rook;
 
             switch (castleType)
             {
@@ -109,19 +109,19 @@ namespace ChessCore
             }
         }
 
-        private bool IsCastleMove(King king, BoardCell startingCell, BoardCell endingCell, out CastleType? type)
+        private bool IsCastleMove(King king, Square startingSquare, Square endingSquare, out CastleType? type)
         {
             type = null;
 
-            if (startingCell.Position != king.GetCastleStartingPosition())
+            if (startingSquare.Coordinate != king.GetCastleStartingPosition())
                 return false;
 
-            if (endingCell.Position == king.GetCastleEndingPosition(CastleType.KingSide))
+            if (endingSquare.Coordinate == king.GetCastleEndingPosition(CastleType.KingSide))
             {
                 type = CastleType.KingSide;
                 return true;
             }
-            else if (endingCell.Position == king.GetCastleEndingPosition(CastleType.QueenSide))
+            else if (endingSquare.Coordinate == king.GetCastleEndingPosition(CastleType.QueenSide))
             {
                 type = CastleType.QueenSide;
                 return true;
@@ -134,29 +134,29 @@ namespace ChessCore
 
         #region Generic move
 
-        private bool TryGenericMove(BoardCell startingCell,
-                                          BoardCell endingCell,
+        private bool TryGenericMove(Square startingSquare,
+                                          Square endingSquare,
                                           Board board,
                                           out MoveBase move)
         {
             move = null;
 
-            var isValid = IsValidGenericMove(board, startingCell, endingCell, startingCell.Piece, endingCell.Piece);
+            var isValid = IsValidGenericMove(board, startingSquare, endingSquare, startingSquare.Piece, endingSquare.Piece);
             if (isValid)
-                move = new GenericMove(startingCell.Position,
-                                       endingCell.Position,
-                                       startingCell.Piece,
-                                       endingCell.Piece,
-                                       endingCell.Piece != null,
-                                       GetAmbiguousMove(board, endingCell.Position, startingCell.Piece),
+                move = new Move(startingSquare.Coordinate,
+                                       endingSquare.Coordinate,
+                                       startingSquare.Piece,
+                                       endingSquare.Piece,
+                                       endingSquare.Piece != null,
+                                       GetAmbiguousMove(board, endingSquare.Coordinate, startingSquare.Piece),
                                        null);
 
             return isValid;
         }
 
-        private GenericMove GetAmbiguousMove(Board board, Position endingPosition, Piece movedPiece)
+        private Move GetAmbiguousMove(Board board, SquareCoordinate endingCoordinate, Piece movedPiece)
         {
-            if (!board.AnyPlayingPieceOfSameTypeAndColor(movedPiece)
+            if (!board.ExistsPlayingPieceOfSameTypeAndColor(movedPiece)
                 || movedPiece is Bishop)
                 return null;
 
@@ -165,66 +165,66 @@ namespace ChessCore
 
         #region Move validity
 
-        private bool IsValidGenericMove(Board board, BoardCell startingPosition, BoardCell endingPosition, Piece movedPiece, Piece capturedPiece)
+        private bool IsValidGenericMove(Board board, Square startingCoordinate, Square endingCoordinate, Piece movedPiece, Piece capturedPiece)
         {
-            return IsPossibleMove(board, startingPosition.Position, endingPosition.Position, movedPiece, capturedPiece)
-                && IsNotCheck(board, startingPosition, endingPosition, movedPiece);
+            return IsPossibleMove(board, startingCoordinate.Coordinate, endingCoordinate.Coordinate, movedPiece, capturedPiece)
+                && IsNotCheck(board, startingCoordinate, endingCoordinate, movedPiece);
         }
 
-        private bool IsPossibleMove(Board board, Position startingPosition, Position endingPosition, Piece movedPiece, Piece capturedPiece)
+        private bool IsPossibleMove(Board board, SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece movedPiece, Piece capturedPiece)
         {
             return movedPiece != null
-                && IsAllowedMove(board, startingPosition, endingPosition, movedPiece, capturedPiece)
-                && IsAllowedCapture(startingPosition, endingPosition, movedPiece, capturedPiece);
+                && IsAllowedMove(board, startingCoordinate, endingCoordinate, movedPiece, capturedPiece)
+                && IsAllowedCapture(startingCoordinate, endingCoordinate, movedPiece, capturedPiece);
         }
 
-        private bool IsNotCheck(Board board, BoardCell startingPosition, BoardCell endingPosition, Piece movedPiece)
+        private bool IsNotCheck(Board board, Square startingCoordinate, Square endingCoordinate, Piece movedPiece)
         {
-            return IsNotGettingInCheck(board, startingPosition.Position, endingPosition.Position, movedPiece)
-                && KingIsNotInCheck(board, startingPosition, endingPosition, movedPiece.Color);
+            return IsNotGettingInCheck(board, startingCoordinate.Coordinate, endingCoordinate.Coordinate, movedPiece)
+                && KingIsNotInCheck(board, startingCoordinate, endingCoordinate, movedPiece.Color);
         }
 
-        private bool KingIsNotInCheck(Board board, BoardCell startingPosition, BoardCell endingPosition, Color movingColor)
+        private bool KingIsNotInCheck(Board board, Square startingCoordinate, Square endingCoordinate, Color movingColor)
         {
-            return !board.WouldBeInCheckAfterMove(startingPosition, endingPosition);
+            return !board.WouldBeInCheckAfterMove(startingCoordinate, endingCoordinate);
         }
 
-        private bool IsNotGettingInCheck(Board board, Position startingPosition, Position endingPosition, Piece movedPiece)
+        private bool IsNotGettingInCheck(Board board, SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece movedPiece)
         {
             return movedPiece is King
-                ? IsNotCheckOnKingMove(board, startingPosition, endingPosition, movedPiece.Color)
-                : IsNotBreakingAbsolutePin(board, startingPosition, endingPosition, movedPiece.Color);
+                ? IsNotCheckOnKingMove(board, startingCoordinate, endingCoordinate, movedPiece.Color)
+                : IsNotBreakingAbsolutePin(board, startingCoordinate, endingCoordinate, movedPiece.Color);
         }
 
-        private bool IsNotBreakingAbsolutePin(Board board, Position startingPosition, Position endingPosition, Color movingSide)
+        private bool IsNotBreakingAbsolutePin(Board board, SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Color movingSide)
         {
-            var kingPosition = board.GetKingCell(movingSide);
-            return !board.IsInOpponentControlAfterMove(board.GetCell(startingPosition),
-                                                       board.GetCell(endingPosition),
+            var kingPosition = board.GetKingSquare(movingSide);
+            return !board.IsInOpponentControlAfterMove(board.GetSquare(startingCoordinate),
+                                                       board.GetSquare(endingCoordinate),
                                                        kingPosition);
         }
 
-        private bool IsNotCheckOnKingMove(Board board, Position startingPosition, Position endingPosition, Color kingColor)
+        private bool IsNotCheckOnKingMove(Board board, SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Color kingColor)
         {
-            return !board.IsControlledByOppositeColor(endingPosition, kingColor)
-                && !board.IsInOpponentControlAfterMove(board.GetCell(startingPosition),
-                                                       board.GetCell(endingPosition),
-                                                       board.GetCell(endingPosition));
+            return !board.IsControlledByOppositeColor(endingCoordinate, kingColor)
+                && !board.IsInOpponentControlAfterMove(board.GetSquare(startingCoordinate),
+                                                       board.GetSquare(endingCoordinate),
+                                                       board.GetSquare(endingCoordinate));
         }
 
-        private bool IsAllowedMove(Board board, Position startingPosition, Position endingPosition, Piece movedPiece, Piece capturedPiece)
+        private bool IsAllowedMove(Board board, SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece movedPiece, Piece capturedPiece)
         {
-            return movedPiece.IsPieceMove(startingPosition, endingPosition, capturedPiece)
-                && InBetweenPiecesValid(board, startingPosition, endingPosition, movedPiece);
+            return movedPiece.IsPieceMove(startingCoordinate, endingCoordinate, capturedPiece)
+                && InBetweenPiecesValid(board, startingCoordinate, endingCoordinate, movedPiece);
         }
 
-        private bool InBetweenPiecesValid(Board board, Position startingPosition, Position endingPosition, Piece movedPiece)
+        private bool InBetweenPiecesValid(Board board, SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece movedPiece)
         {
             return movedPiece.CanJumpOverPieces()
-                || !board.IsAnyPieceInBetween(startingPosition, endingPosition);
+                || !board.IsAnyPieceInBetween(startingCoordinate, endingCoordinate);
         }
 
-        private bool IsAllowedCapture(Position startingPosition, Position endingPosition, Piece movedPiece, Piece capturedPiece)
+        private bool IsAllowedCapture(SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece movedPiece, Piece capturedPiece)
         {
             return capturedPiece == null
                 || movedPiece.Color.IsOpponentColor(capturedPiece.Color);
