@@ -3,6 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -52,23 +53,28 @@ namespace Presentation
         private static Cursor InternalCreateCursor(System.Drawing.Bitmap bmp, int xHotspot = 0, int yHotspot = 0)
         {
             var iconInfo = new NativeMethods.IconInfo();
-            NativeMethods.GetIconInfo(bmp.GetHicon(), ref iconInfo);
+            var handler = bmp.GetHicon();
+            NativeMethods.GetIconInfo(handler, ref iconInfo);
+            NativeMethods.DestroyIcon(handler);
 
             iconInfo.xHotspot = xHotspot;
             iconInfo.yHotspot = yHotspot;
             iconInfo.fIcon = false;
 
-            SafeIconHandle cursorHandle = NativeMethods.CreateIconIndirect(ref iconInfo);
+            var cursorHandle = NativeMethods.CreateIconIndirect(ref iconInfo);
             return CursorInteropHelper.Create(cursorHandle);
+
         }
 
-        public static Cursor CreateCursor(UIElement element, bool centerHotspot)
+        public static Cursor CreateCursor(Image image)
         {
-            element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-            element.Arrange(new Rect(new Point(), element.DesiredSize));
+            image.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            image.Arrange(new Rect(new Point(), image.DesiredSize));
 
-            var width = (int)element.DesiredSize.Width;
-            var heigth = (int)element.DesiredSize.Height;
+            var width = (int)image.DesiredSize.Width;
+            var heigth = (int)image.DesiredSize.Height;
+
+            GC.WaitForPendingFinalizers();
 
             RenderTargetBitmap rtb =
               new RenderTargetBitmap(
@@ -76,7 +82,7 @@ namespace Presentation
                 heigth,
                 100, 96, PixelFormats.Pbgra32);
 
-            rtb.Render(element);
+            rtb.Render(image);
 
             var encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(rtb));
@@ -86,7 +92,7 @@ namespace Presentation
                 encoder.Save(ms);
                 using (var bmp = new System.Drawing.Bitmap(ms))
                 {
-                    return InternalCreateCursor(bmp, width/2, heigth/2);
+                    return InternalCreateCursor(bmp, width / 2, heigth / 2);
                 }
             }
         }

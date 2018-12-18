@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Windows;
+﻿using System.Windows;
 
 namespace Presentation
 {
@@ -10,12 +9,13 @@ namespace Presentation
     {
         private BoardControl _board;
 
-        public MainWindow(MainWindowVM mainWindowVM)
+        public MainWindow(MainWindowVM mainWindowVM,
+                          IImagesFactory imagesFactory)
         {
             InitializeComponent();
             DataContext = mainWindowVM;
 
-            _board = new BoardControl(mainWindowVM.Board);
+            _board = new BoardControl(mainWindowVM.Board, imagesFactory);
             BoardGrid.Children.Add(_board);
         }
 

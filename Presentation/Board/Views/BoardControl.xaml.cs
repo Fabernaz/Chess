@@ -17,15 +17,17 @@ namespace Presentation
         private const double IMAGE_PADDING_PERC = 0.11;
         private const double BORDER_THICKNESS_PERC = 0.035;
         private static readonly Uri BORDER_URI = new Uri("pack://application:,,,/Board/Images/DarkWood.jpg");
-
+        private readonly IImagesFactory _piecesImageFactory;
         private BoardVM _vm;
         private List<BoardCellControl> _cells = new List<BoardCellControl>();
 
-        public BoardControl(BoardVM vm)
+        public BoardControl(BoardVM vm,
+                            IImagesFactory piecesImageFactory)
         {
             InitializeComponent();
 
             Border.BorderBrush = new ImageBrush(new BitmapImage(BORDER_URI));
+            _piecesImageFactory = piecesImageFactory;
 
             _vm = vm;
             DataContext = vm;
@@ -48,7 +50,7 @@ namespace Presentation
 
         private BoardCellControl GetCellFromVM(SquareVM vm)
         {
-            return new BoardCellControl(vm);
+            return new BoardCellControl(vm, _piecesImageFactory);
         }
 
         #endregion

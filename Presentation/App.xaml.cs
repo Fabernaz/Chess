@@ -15,6 +15,7 @@ namespace Presentation
         {
             containerRegistry.Register<IStartingPiecesSetFactory, ClassicStartingPiecesSetFactory>();
             containerRegistry.Register<IBoardFactory, BoardFactory>();
+            containerRegistry.Register<IImagesFactory, ImagesFactory>();
         }
 
         protected override Window CreateShell()

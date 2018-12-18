@@ -88,11 +88,7 @@
 
         public override string ToString()
         {
-            return _Color == PieceColor.White
-                ? "White"
-                : "Black";
-
-            //TODO: presentation logic!!
+            return _Color == PieceColor.White ? "White" : "Black";
         }
 
         private enum PieceColor

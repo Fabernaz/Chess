@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ChessCore;
-using CommonServiceLocator;
 using ReactiveUI;
 
 namespace Presentation
@@ -21,14 +20,18 @@ namespace Presentation
         private static readonly Uri LIGHT_SQUARE_URI = new Uri("pack://application:,,,/Board/Images/LightSquare.jpg");
         private readonly SquareVM _vm;
         private readonly BoardVM _board;
+        private readonly IImagesFactory _imageFactory;
+        private Cursor _cursor;
 
         public SquareCoordinate Position { get; }
 
-        public BoardCellControl(SquareVM vm)
+        public BoardCellControl(SquareVM vm,
+                                IImagesFactory imagesFactory)
         {
             _vm = vm;
             _board = vm.Board;
             DataContext = vm;
+            _imageFactory = imagesFactory;
 
             Position = vm.Position;
             Background = GetColorFromVM(vm.Color);
@@ -43,7 +46,7 @@ namespace Presentation
 
         private void SetImage(Piece piece)
         {
-            Image.ImageSource = piece == null ? null : new BitmapImage(piece.ImageUri);
+            Image.ImageSource = _imageFactory.GetPieceImage(piece);
         }
 
         private void SetGridCoordinate()
@@ -85,6 +88,9 @@ namespace Presentation
                 startingCellVM.Board.OnMoveMade(startingCellVM, endingCellVM);
 
             _board.MoveEnded();
+
+            if (_cursor != null && startingCellVM.Square != endingCellVM.Square)
+                _cursor.Dispose();
         }
 
         private bool HasRightColorPiece()
@@ -98,26 +104,10 @@ namespace Presentation
         {
             var cellControl = sender as BoardCellControl;
             var imageSize = cellControl.ActualHeight - 2 * cellControl.TopRow.ActualHeight;
-            var imageUri = ((SquareVM)DataContext).Piece.ImageUri;
-            var cursor = CursorHelper.CreateCursor(GetCursorTemplate(imageUri, imageSize), true);
-            Mouse.SetCursor(cursor);
+            _cursor = _imageFactory.GetPieceCursor(((SquareVM)DataContext).Piece, imageSize);
+            Mouse.SetCursor(_cursor);
 
             e.Handled = true;
-        }
-
-        private Grid GetCursorTemplate(Uri uri, double imageSize)
-        {
-            var im = new System.Windows.Controls.Image
-            {
-                Source = new BitmapImage(uri),
-                Width = imageSize,
-                Height = imageSize
-            };
-
-            var grid = new Grid();
-      
-            grid.Children.Add(im);
-            return grid;
         }
     }
 }

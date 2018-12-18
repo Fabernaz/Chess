@@ -166,6 +166,8 @@
     </ApplicationDefinition>
     <Compile Include="Board\ViewModels\SquareVM.cs" />
     <Compile Include="Converters\BoolInvertedVisibilityConverter.cs" />
+    <Compile Include="Pieces\IImagesFactory.cs" />
+    <Compile Include="Pieces\ImagesFactory.cs" />
     <Compile Include="ReactiveViewModelBase.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Board\ViewModels\BoardVM.cs" />
