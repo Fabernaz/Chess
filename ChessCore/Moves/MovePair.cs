@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ChessCore
 {
-    internal class MovePair
+    public class MovePair
     {
         public int MoveNumber { get; }
         public MoveBase WhiteMove { get; set; }

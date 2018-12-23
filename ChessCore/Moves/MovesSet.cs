@@ -5,14 +5,14 @@ namespace ChessCore
 {
     public class MovesSet
     {
-        private readonly ISet<MovePair> _moves;
+        private readonly List<MovePair> _moves;
         private Color _currentPieceMoveColor;
         private MovePair _currentMove;
         private MoveBase _lastMoveAdded;
 
         internal MovesSet()
         {
-            _moves = new HashSet<MovePair>();
+            _moves = new List<MovePair>();
             _currentPieceMoveColor = Color.White;
         }
 
@@ -54,6 +54,11 @@ namespace ChessCore
         private void FlipColor()
         {
             _currentPieceMoveColor = _currentPieceMoveColor.OpponentColor;
+        }
+
+        internal IEnumerable<MovePair> GetAllMoves()
+        {
+            return _moves;
         }
     }
 }

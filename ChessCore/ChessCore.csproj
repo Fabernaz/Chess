@@ -47,6 +47,10 @@
     <Compile Include="Board\PiecesInfluenceManager.cs" />
     <Compile Include="Board\PiecesMobilityManager.cs" />
     <Compile Include="Board\PiecesControlManager.cs" />
+    <Compile Include="Board\TemporaryMoveDisposable.cs" />
+    <Compile Include="Board\Timer\PlayerTimer.cs" />
+    <Compile Include="Board\Timer\TimerConfiguration.cs" />
+    <Compile Include="Board\Timer\TimerManager.cs" />
     <Compile Include="Color\Color.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Moves\MoveTypes\CastlingKingSide.cs" />

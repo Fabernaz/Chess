@@ -5,7 +5,7 @@ namespace ChessCore
 {
     public abstract class MoveBase
     {
-        protected bool _isCheck;
+        internal bool IsCheck { get; private set; }
 
         internal bool Played { get; private set; }
 
@@ -16,20 +16,20 @@ namespace ChessCore
             IsCapture = isCapture;
         }
 
-        internal virtual void PlayMove()
+        internal void PlayMove()
         {
             OnMovePlayed();
 
             Played = true;
         }
 
-        internal abstract void OnMovePlayed();
+        protected abstract void OnMovePlayed();
 
         internal abstract MoveOperations GetMoveOperations();
 
         internal abstract PiecesAffectedByMove GetAffectedPieces();
 
-        internal abstract SquareCoordinate GetMovedPieceEndingSquare();
+        internal abstract Square GetMovedPieceEndingSquare();
 
         internal virtual NextMoveAllowedEnPassant GetAllowEnPassantOnNextMoveInfo()
         {
@@ -38,7 +38,7 @@ namespace ChessCore
 
         protected string GetIsCheckNotation()
         {
-            return _isCheck ?
+            return IsCheck ?
                 "+" :
                 String.Empty;
         }

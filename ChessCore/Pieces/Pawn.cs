@@ -7,53 +7,44 @@ namespace ChessCore
     {
         public override bool CanPin => false;
 
-        public Pawn(Color color, SquareCoordinate startingCoordinate)
-            :base(color, startingCoordinate)
+        public Pawn(Color color)
+            :base(color)
         { }
 
         protected override IEnumerable<SquareCoordinate> GetAvailableMoves(Board board)
         {
-            return MoveUtilities.GetPawnAvailability(CurrentCoordinate.Value, board, Color, SquareInfluenceType.Mobility)
-                ;
+            return MoveUtilities.GetPawnAvailability(CurrentSquare.Coordinate, board, Color, SquareInfluenceType.Mobility);
         }
 
         protected override IEnumerable<SquareCoordinate> GetNewControlledSquares(Board board)
         {
-            return MoveUtilities.GetPawnAvailability(CurrentCoordinate.Value, board, Color, SquareInfluenceType.Control)
-                ;
+            return MoveUtilities.GetPawnAvailability(CurrentSquare.Coordinate, board, Color, SquareInfluenceType.Control);
         }
 
         internal IEnumerable<SquareCoordinate> GetFrontSquares()
         {
-            return MoveUtilities.GetPawnFrontSquares(CurrentCoordinate.Value, Color);
+            return MoveUtilities.GetPawnFrontSquares(CurrentSquare.Coordinate, Color);
         }
 
-        public override bool IsPieceMove(SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece capturedPiece)
+        public override bool IsPieceMove(Square startingSquare, Square endingSquare, Piece capturedPiece)
         {
-            return IsValidCapturingMove(startingCoordinate, endingCoordinate, capturedPiece)
-                || IsValidNonCapturingMove(startingCoordinate, endingCoordinate, capturedPiece);
+            return IsValidCapturingMove(startingSquare, endingSquare, capturedPiece)
+                || IsValidNonCapturingMove(startingSquare, endingSquare, capturedPiece);
         }
 
-        private bool IsValidNonCapturingMove(SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece capturedPiece)
+        private bool IsValidNonCapturingMove(Square startingSquare, Square endingSquare, Piece capturedPiece)
         {
-            var vectorRankMove = Color.MovingDirection * startingCoordinate.GetRankDifference(endingCoordinate);
+            var vectorRankMove = Color.MovingDirection * startingSquare.Coordinate.GetRankDifference(endingSquare.Coordinate);
             return capturedPiece == null
-                && startingCoordinate.IsOnSameFile(endingCoordinate)
+                && startingSquare.Coordinate.IsOnSameFile(endingSquare.Coordinate)
                 && vectorRankMove > 0 
                 && vectorRankMove <= (HasBeenMoved ? 1 : 2);
         }
 
-        private bool IsValidCapturingMove(SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece capturedPiece)
+        private bool IsValidCapturingMove(Square startingSquare, Square endingSquare, Piece capturedPiece)
         {
             return capturedPiece != null
-                && startingCoordinate.IsOnDiagonalAdjacentSquare(endingCoordinate);
-        }
-
-        protected override Uri GetImageUri()
-        {
-            return new Uri("pack://application:,,,/Pieces/Images/"
-                + Color.ToString()
-                + "Pawn.png");
+                && startingSquare.Coordinate.IsOnDiagonalAdjacentSquare(endingSquare.Coordinate);
         }
 
         public override string GetMoveRepresentation()

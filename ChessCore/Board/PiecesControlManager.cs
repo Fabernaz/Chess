@@ -19,7 +19,7 @@ namespace ChessCore
 
         #region Constructors
 
-        internal PiecesControlManager(Board board, 
+        internal PiecesControlManager(Board board,
                                       IDictionary<Square, ISet<Piece>> pieceControlDict,
                                       ISet<Square> allSquares)
         {
@@ -111,10 +111,7 @@ namespace ChessCore
         internal ISet<SquareCoordinate> GetOpponentControlOnPosition(Square position, Color color)
         {
             var ret = new HashSet<SquareCoordinate>();
-
-            var allPieces = _piecesControlDict[position];
-            var opponentPiecesss = allPieces.Where(piece => piece.Color.IsOpponentColor(color));
-
+            
             var opponentControllingPieces = _piecesControlDict[position]
                                                 .Where(piece => piece.Color.IsOpponentColor(color));
 
@@ -142,23 +139,19 @@ namespace ChessCore
                 RecalculateControlOnInterfearingPieceMoved(move);
 
             ResetSquaresControl();
-            
         }
 
         private void RecalculateControlOnInterfearingPieceMoved(PieceMove move)
         {
-            var startingSquare = _board.GetSquare(move.StartingSquare);
-            var endingSquare = _board.GetSquare(move.EndingSquare);
-
-            var controllingPieces = _piecesControlDict[startingSquare];
-            foreach (var controllingPiece in controllingPieces.ToList())
-                OnPieceMoved(new PieceMove(startingSquare.Coordinate, startingSquare.Coordinate, controllingPiece, null));
+            var controllingPieces = _piecesControlDict[move.StartingSquare];
+            foreach (var controllingPiece in controllingPieces.Where(p => !p.Captured).ToList())
+                OnPieceMoved(new PieceMove(move.StartingSquare, move.StartingSquare, controllingPiece, null));
 
             if (!move.IsCapture)
             {
-                controllingPieces = _piecesControlDict[endingSquare];
-                foreach (var controllingPiece in controllingPieces.ToList())
-                    OnPieceMoved(new PieceMove(endingSquare.Coordinate, endingSquare.Coordinate, controllingPiece, null));
+                controllingPieces = _piecesControlDict[move.EndingSquare];
+                foreach (var controllingPiece in controllingPieces.Where(p => !p.Captured).ToList())
+                    OnPieceMoved(new PieceMove(move.EndingSquare, move.EndingSquare, controllingPiece, null));
             }
         }
 
@@ -208,6 +201,7 @@ namespace ChessCore
 
             RemovePreviousControlledSquares(capturedPiece, previouslyControlledSquares);
             _control[capturedPiece.Color].Remove(capturedPiece);
+            _piecesControlDict[capturedPiece.CurrentSquare].Remove(capturedPiece);
             ResetSquaresControl();
         }
 
@@ -218,25 +212,25 @@ namespace ChessCore
 
         internal void PlayTemporaryMove(TemporaryMoveDisposable disp)
         {
-            var attackingOpponentPieces = _piecesControlDict[disp._startingSquare]
-                .Where(p => p.Color.IsOpponentColor(disp._movedPiece.Color));
+            var attackingOpponentPieces = _piecesControlDict[disp.StartingSquare];
+            attackingOpponentPieces.Add(disp.MovedPiece);
 
-            foreach(var attackingPiece in attackingOpponentPieces.ToList())
+            foreach (var attackingPiece in attackingOpponentPieces.Where(p => !p.Captured).ToList())
             {
                 var newControlledSquares = attackingPiece.GetControlledSquares(_board)
                                              .Select(p => _board.GetSquare(p));
                 var previouslyControlledSquares = _control[attackingPiece.Color][attackingPiece];
 
-                ReplateSquareInPiecesControlDict(attackingPiece, newControlledSquares, previouslyControlledSquares);
+                ReplaceSquareInPiecesControlDict(attackingPiece, newControlledSquares, previouslyControlledSquares);
 
                 disp.Disposing += (sender, e) =>
                 {
-                    ReplateSquareInPiecesControlDict(attackingPiece, previouslyControlledSquares, newControlledSquares);
+                    ReplaceSquareInPiecesControlDict(attackingPiece, previouslyControlledSquares, newControlledSquares);
                 };
             }
         }
 
-        private void ReplateSquareInPiecesControlDict(Piece piece, IEnumerable<Square> newControlledSquares, IEnumerable<Square> previouslyControlledSquares)
+        private void ReplaceSquareInPiecesControlDict(Piece piece, IEnumerable<Square> newControlledSquares, IEnumerable<Square> previouslyControlledSquares)
         {
             foreach (var square in previouslyControlledSquares)
                 _piecesControlDict[square].Remove(piece);

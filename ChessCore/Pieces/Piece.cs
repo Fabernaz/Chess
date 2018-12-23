@@ -6,42 +6,40 @@ namespace ChessCore
 {
     public abstract class Piece
     {
-        //Never concretize this collection, LINQ deferred execution ensures that not-in-check 
-        //moves are calculated after black move
         protected IEnumerable<SquareCoordinate> _availableMoves;
 
         public Color Color { get; }
 
-        public SquareCoordinate? CurrentCoordinate { get; set; }
+        public Square CurrentSquare { get; set; }
 
-        public bool IsBeenCaptured { get { return CurrentCoordinate != null; } }
-
-        public Uri ImageUri { get; }
+        public bool Captured { get; set; }
 
         public bool HasBeenMoved { get; private set; }
 
         public abstract bool CanPin { get; }
 
-        public abstract bool IsPieceMove(SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece capturedPiece);
+        public abstract bool IsPieceMove(Square startingCoordinate, Square endingCoordinate, Piece capturedPiece);
 
-        public void OnPieceMoved(SquareCoordinate newPosition)
+        public void OnPieceMoved(Square newPosition)
         {
             HasBeenMoved = true;
-            CurrentCoordinate = newPosition;
+            CurrentSquare = newPosition;
         }
 
         public void OnPieceCaptured()
         {
-            CurrentCoordinate = null;
+            Captured = true;
             _availableMoves = null;
         }
 
-        public Piece(Color color, SquareCoordinate position)
+        #region Constructors
+
+        public Piece(Color color)
         {
             Color = color;
-            CurrentCoordinate = position;
-            ImageUri = GetImageUri();
         }
+
+        #endregion
 
         public virtual bool CanJumpOverPieces()
         {
@@ -57,9 +55,6 @@ namespace ChessCore
 
         public abstract string GetMoveRepresentation();
 
-        //TODO: this is presentation logic!!
-        protected abstract Uri GetImageUri();
-
         public IEnumerable<SquareCoordinate> GetAvailableMoves()
         {
             return _availableMoves;
@@ -73,23 +68,19 @@ namespace ChessCore
 
         internal void ResetAvailableMoves(Board board)
         {
-            _availableMoves = CurrentCoordinate.HasValue
+            _availableMoves = CurrentSquare != null
                 ? GetAvailableMoves(board)
-                         .Where(s => !board.WouldBeInCheckAfterMove(board.GetSquare(CurrentCoordinate.Value), board.GetSquare(s)))
+                         .Where(s => !board.WouldBeInCheckAfterMove(CurrentSquare, board.GetSquare(s)))
                 : new List<SquareCoordinate>();
         }
 
-        //Never concretize this collection, LINQ deferred execution ensures that not-in-check 
-        //moves are calculated after black move
         internal IEnumerable<SquareCoordinate> GetControlledSquares(Board board)
         {
-            return CurrentCoordinate.HasValue
+            return CurrentSquare != null
                 ? GetNewControlledSquares(board)
                 : new List<SquareCoordinate>();
         }
 
-        //Never concretize this collection, LINQ deferred execution ensures that not-in-check 
-        //moves are calculated after black move
         protected abstract IEnumerable<SquareCoordinate> GetAvailableMoves(Board board);
     }
 }

@@ -11,36 +11,36 @@ namespace ChessCore
         #region Fields
 
         private readonly Pawn _movedPawn;
-        private readonly SquareCoordinate _startingMovedPawnPosition;
-        private readonly SquareCoordinate _endingMovedPawnPosition;
+        private readonly Square _startingMovedPawnSquare;
+        private readonly Square _endingMovedPawnSquare;
         private readonly Pawn _capturedPawn;
-        private readonly SquareCoordinate _capturedPawnPosition;
+        private readonly Square _capturedPawnSquare;
 
         #endregion
 
         #region Constructors
 
         internal EnPassant(Pawn movedPawn,
-                           SquareCoordinate startingMovedPawnPosition,
-                           SquareCoordinate endingMovedPawnPosition,
+                           Square startingMovedPawnSquare,
+                           Square endingMovedPawnSquare,
                            Pawn capturedPawn,
-                           SquareCoordinate capturedPawnPosition)
+                           Square capturedPawnPosition)
             : base(true)
         {
             _movedPawn = movedPawn;
-            _startingMovedPawnPosition = startingMovedPawnPosition;
-            _endingMovedPawnPosition = endingMovedPawnPosition;
+            _startingMovedPawnSquare = startingMovedPawnSquare;
+            _endingMovedPawnSquare = endingMovedPawnSquare;
             _capturedPawn = capturedPawn;
-            _capturedPawnPosition = capturedPawnPosition;
+            _capturedPawnSquare = capturedPawnPosition;
         }
 
         #endregion
 
         #region Move
 
-        internal override void OnMovePlayed()
+        protected override void OnMovePlayed()
         {
-            _movedPawn.OnPieceMoved(_endingMovedPawnPosition);
+            _movedPawn.OnPieceMoved(_endingMovedPawnSquare);
             _capturedPawn.OnPieceCaptured();
         }
 
@@ -50,9 +50,9 @@ namespace ChessCore
 
         public override string ToString()
         {
-            return string.Format("{0}x{1}{2}e.p.{3}", MoveUtilities.GetFileFromInt(_startingMovedPawnPosition.File),
-                                                      MoveUtilities.GetFileFromInt(_endingMovedPawnPosition.File),
-                                                      _endingMovedPawnPosition.Rank,
+            return string.Format("{0}x{1}{2}e.p.{3}", MoveUtilities.GetFileFromInt(_startingMovedPawnSquare.Coordinate.File),
+                                                      MoveUtilities.GetFileFromInt(_endingMovedPawnSquare.Coordinate.File),
+                                                      _endingMovedPawnSquare.Coordinate.Rank,
                                                       GetIsCheckNotation());
         }
 
@@ -69,8 +69,8 @@ namespace ChessCore
         {
             var ret = new MoveOperations();
 
-            ret.MovedPieces.Add(new PieceMove(_startingMovedPawnPosition,
-                                              _endingMovedPawnPosition,
+            ret.MovedPieces.Add(new PieceMove(_startingMovedPawnSquare,
+                                              _endingMovedPawnSquare,
                                               _movedPawn,
                                               _capturedPawn));
             ret.CapturedPieces.Add(_capturedPawn);
@@ -78,9 +78,9 @@ namespace ChessCore
             return ret;
         }
 
-        internal override SquareCoordinate GetMovedPieceEndingSquare()
+        internal override Square GetMovedPieceEndingSquare()
         {
-            return _endingMovedPawnPosition;
+            return _endingMovedPawnSquare;
         }
 
         #endregion

@@ -8,30 +8,23 @@ namespace ChessCore
     {
         public override bool CanPin => true;
 
-        public Rook(Color color, SquareCoordinate position)
-            :base(color, position)
+        public Rook(Color color)
+            :base(color)
         { }
 
         protected override IEnumerable<SquareCoordinate> GetAvailableMoves(Board board)
         {
-            return MoveUtilities.GetLineAvailability(CurrentCoordinate.Value, board, Color, SquareInfluenceType.Mobility);
+            return MoveUtilities.GetLineAvailability(CurrentSquare.Coordinate, board, Color, SquareInfluenceType.Mobility);
         }
 
         protected override IEnumerable<SquareCoordinate> GetNewControlledSquares(Board board)
         {
-            return MoveUtilities.GetLineAvailability(CurrentCoordinate.Value, board, Color, SquareInfluenceType.Control);
+            return MoveUtilities.GetLineAvailability(CurrentSquare.Coordinate, board, Color, SquareInfluenceType.Control);
         }
 
-        public override bool IsPieceMove(SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece capturedPiece)
+        public override bool IsPieceMove(Square startingSquare, Square endingSquare, Piece capturedPiece)
         {
-            return startingCoordinate.IsOnRankOrFile(endingCoordinate);
-        }
-
-        protected override Uri GetImageUri()
-        {
-            return new Uri("pack://application:,,,/Pieces/Images/"
-                + Color.ToString()
-                + "Rook.png");
+            return startingSquare.Coordinate.IsOnRankOrFile(endingSquare.Coordinate);
         }
 
         public override string GetMoveRepresentation()

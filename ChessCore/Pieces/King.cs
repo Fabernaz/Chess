@@ -8,8 +8,8 @@ namespace ChessCore
     {
         public override bool CanPin => false;
 
-        public King(Color color, SquareCoordinate startingCoordinate)
-            : base(color, startingCoordinate)
+        public King(Color color)
+            : base(color)
         { }
 
         internal SquareCoordinate GetCastleRookEndingPosition(CastleType type)
@@ -98,31 +98,24 @@ namespace ChessCore
 
         protected override IEnumerable<SquareCoordinate> GetAvailableMoves(Board board)
         {
-            return MoveUtilities.GetKingAvailability(this, CurrentCoordinate.Value, board, SquareInfluenceType.Mobility)
+            return MoveUtilities.GetKingAvailability(this, CurrentSquare.Coordinate, board, SquareInfluenceType.Mobility)
                 ;
         }
 
         protected override IEnumerable<SquareCoordinate> GetNewControlledSquares(Board board)
         {
-            return MoveUtilities.GetKingAvailability(this, CurrentCoordinate.Value, board, SquareInfluenceType.Control)
+            return MoveUtilities.GetKingAvailability(this, CurrentSquare.Coordinate, board, SquareInfluenceType.Control)
                 ;
         }
 
-        public override bool IsPieceMove(SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece capturedPiece)
+        public override bool IsPieceMove(Square startingSquare, Square endingSquare, Piece capturedPiece)
         {
-            return MoveUtilities.IsKingValidMove(startingCoordinate, endingCoordinate);
+            return MoveUtilities.IsKingValidMove(startingSquare.Coordinate, endingSquare.Coordinate);
         }
 
         public override string GetMoveRepresentation()
         {
             return Resource.KingLetter;
-        }
-
-        protected override Uri GetImageUri()
-        {
-            return new Uri("pack://application:,,,/Pieces/Images/"
-                + Color.ToString()
-                + "King.png");
         }
     }
 

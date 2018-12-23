@@ -4,6 +4,17 @@ namespace ChessCore
 {
     public interface IStartingPiecesSetFactory
     {
-        IEnumerable<Piece> GetPiecesInStartingPosition();
+        IEnumerable<PieceCoordinatePair> GetPiecesInStartingPosition();
+    }
+
+    public class PieceCoordinatePair
+    {
+        public Piece Piece { get; }
+        public SquareCoordinate SquareCoordinate { get; }
+        public PieceCoordinatePair(Piece piece, SquareCoordinate squareCoordinate)
+        {
+            Piece = piece;
+            SquareCoordinate = squareCoordinate;
+        }
     }
 }

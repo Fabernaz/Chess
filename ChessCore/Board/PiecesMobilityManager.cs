@@ -86,8 +86,8 @@ namespace ChessCore
         {
             foreach (var move in moveOperations.MovedPieces)
                 ResetPiecesMobility(move.MovedPiece,
-                                    _board.GetSquare(move.StartingSquare),
-                                    _board.GetSquare(move.EndingSquare));
+                                    move.StartingSquare,
+                                    move.EndingSquare);
         }
 
         #endregion

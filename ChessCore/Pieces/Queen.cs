@@ -9,32 +9,25 @@ namespace ChessCore
     {
         public override bool CanPin => true;
 
-        public Queen(Color color, SquareCoordinate position)
-            :base(color, position)
+        public Queen(Color color)
+            :base(color)
         { }
 
         protected override IEnumerable<SquareCoordinate> GetAvailableMoves(Board board)
         {
-            return MoveUtilities.GetDiagonalAvailability(CurrentCoordinate.Value, board, Color, SquareInfluenceType.Mobility)
-              .Concat(MoveUtilities.GetLineAvailability(CurrentCoordinate.Value, board, Color, SquareInfluenceType.Mobility));
+            return MoveUtilities.GetDiagonalAvailability(CurrentSquare.Coordinate, board, Color, SquareInfluenceType.Mobility)
+              .Concat(MoveUtilities.GetLineAvailability(CurrentSquare.Coordinate, board, Color, SquareInfluenceType.Mobility));
         }
 
         protected override IEnumerable<SquareCoordinate> GetNewControlledSquares(Board board)
         {
-            return MoveUtilities.GetDiagonalAvailability(CurrentCoordinate.Value, board, Color, SquareInfluenceType.Control)
-              .Concat(MoveUtilities.GetLineAvailability(CurrentCoordinate.Value, board, Color, SquareInfluenceType.Control));
+            return MoveUtilities.GetDiagonalAvailability(CurrentSquare.Coordinate, board, Color, SquareInfluenceType.Control)
+              .Concat(MoveUtilities.GetLineAvailability(CurrentSquare.Coordinate, board, Color, SquareInfluenceType.Control));
         }
 
-        public override bool IsPieceMove(SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece capturedPiece)
+        public override bool IsPieceMove(Square startingSquare, Square endingSquare, Piece capturedPiece)
         {
-            return startingCoordinate.IsOnRankFileOrDiagonal(endingCoordinate);
-        }
-
-        protected override Uri GetImageUri()
-        {
-            return new Uri("pack://application:,,,/Pieces/Images/"
-                + Color.ToString()
-                + "Queen.png");
+            return startingSquare.Coordinate.IsOnRankFileOrDiagonal(endingSquare.Coordinate);
         }
 
         public override string GetMoveRepresentation()

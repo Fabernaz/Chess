@@ -9,31 +9,24 @@ namespace ChessCore
     {
         public override bool CanPin => true;
 
-        public Bishop(Color color, SquareCoordinate startingCoordinate)
-            :base(color, startingCoordinate)
+        public Bishop(Color color)
+            :base(color)
         { }
 
-        protected override Uri GetImageUri()
+        public override bool IsPieceMove(Square startingSquare, Square endingSquare, Piece capturedPiece)
         {
-            return new Uri("pack://application:,,,/Pieces/Images/" 
-                + Color.ToString() 
-                + "Bishop.png");
-        }
-
-        public override bool IsPieceMove(SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece capturedPiece)
-        {
-            return startingCoordinate.IsOnDiagonal(endingCoordinate);
+            return startingSquare.Coordinate.IsOnDiagonal(endingSquare.Coordinate);
         }
 
         protected override IEnumerable<SquareCoordinate> GetAvailableMoves(Board board)
         {
-            return MoveUtilities.GetDiagonalAvailability(CurrentCoordinate.Value, board, Color, SquareInfluenceType.Mobility)
+            return MoveUtilities.GetDiagonalAvailability(CurrentSquare.Coordinate, board, Color, SquareInfluenceType.Mobility)
                 ;
         }
 
         protected override IEnumerable<SquareCoordinate> GetNewControlledSquares(Board board)
         {
-            return MoveUtilities.GetDiagonalAvailability(CurrentCoordinate.Value, board, Color, SquareInfluenceType.Control)
+            return MoveUtilities.GetDiagonalAvailability(CurrentSquare.Coordinate, board, Color, SquareInfluenceType.Control)
                 ;
         }
 

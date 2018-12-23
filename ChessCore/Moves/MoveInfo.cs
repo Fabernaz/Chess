@@ -2,14 +2,14 @@
 {
     internal class PieceMove
     {
-        internal SquareCoordinate EndingSquare { get; }
-        internal SquareCoordinate StartingSquare { get; }
+        internal Square EndingSquare { get; }
+        internal Square StartingSquare { get; }
         internal Piece MovedPiece { get; }
         internal Piece CapturedPiece { get; }
         internal bool IsCapture { get { return CapturedPiece != null; } }
 
-        internal PieceMove(SquareCoordinate startingCoordinate, 
-                           SquareCoordinate endingCoordinate,
+        internal PieceMove(Square startingCoordinate, 
+                           Square endingCoordinate,
                            Piece movedPiece,
                            Piece capturedPiece)
         {

@@ -8,6 +8,7 @@ namespace ChessCore
 {
     public class CastlingQueenSide : MoveBase
     {
+        private readonly Board _board;
         private readonly King _king;
         private readonly Rook _rook;
         private readonly SquareCoordinate _kingStartingPosition;
@@ -15,9 +16,10 @@ namespace ChessCore
         private readonly SquareCoordinate _rookStartingPosition;
         private readonly SquareCoordinate _rookEndingPosition;
 
-        public CastlingQueenSide(King king, Rook rook)
+        public CastlingQueenSide(King king, Rook rook, Board board)
             : base(true)
         {
+            _board = board;
             _king = king;
             _rook = rook;
 
@@ -32,25 +34,25 @@ namespace ChessCore
             return new PiecesAffectedByMove(_king, null, _rook);
         }
 
-        internal override SquareCoordinate GetMovedPieceEndingSquare()
+        internal override Square GetMovedPieceEndingSquare()
         {
-            return _king.GetCastleEndingPosition(CastleType.QueenSide);
+            return _board.GetSquare(_king.GetCastleEndingPosition(CastleType.QueenSide));
         }
 
         internal override MoveOperations GetMoveOperations()
         {
             var ret = new MoveOperations();
 
-            ret.MovedPieces.Add(new PieceMove(_kingStartingPosition, _kingEndingPosition, _king, null));
-            ret.MovedPieces.Add(new PieceMove(_rookStartingPosition, _rookEndingPosition, _rook, null));
+            ret.MovedPieces.Add(new PieceMove(_board.GetSquare(_kingStartingPosition), _board.GetSquare(_kingEndingPosition), _king, null));
+            ret.MovedPieces.Add(new PieceMove(_board.GetSquare(_rookStartingPosition), _board.GetSquare(_rookEndingPosition), _rook, null));
 
             return ret;
         }
 
-        internal override void OnMovePlayed()
+        protected override void OnMovePlayed()
         {
-            _king.OnPieceMoved(_kingEndingPosition);
-            _rook.OnPieceMoved(_rookEndingPosition);
+            _king.OnPieceMoved(_board.GetSquare(_kingEndingPosition));
+            _rook.OnPieceMoved(_board.GetSquare(_rookEndingPosition));
         }
 
         #region Notation

@@ -8,23 +8,25 @@ namespace ChessCore
 {
     public class CastlingKingSide : MoveBase
     {
+        private readonly Board _board;
         private readonly King _king;
         private readonly Rook _rook;
-        private readonly SquareCoordinate _kingStartingPosition;
-        private readonly SquareCoordinate _kingEndingPosition;
-        private readonly SquareCoordinate _rookStartingPosition;
-        private readonly SquareCoordinate _rookEndingPosition;
+        private readonly Square _kingStartingPosition;
+        private readonly Square _kingEndingPosition;
+        private readonly Square _rookStartingPosition;
+        private readonly Square _rookEndingPosition;
 
-        public CastlingKingSide(King king, Rook rook)
+        public CastlingKingSide(King king, Rook rook, Board board)
             : base(true)
         {
+            _board = board;
             _king = king;
             _rook = rook;
 
-            _kingStartingPosition = _king.GetCastleStartingPosition();
-            _kingEndingPosition = _king.GetCastleEndingPosition(CastleType.KingSide);
-            _rookStartingPosition = _king.GetCastleRookStartingSquare(CastleType.KingSide);
-            _rookEndingPosition = _king.GetCastleRookEndingPosition(CastleType.KingSide);
+            _kingStartingPosition = board.GetSquare(_king.GetCastleStartingPosition());
+            _kingEndingPosition = board.GetSquare(_king.GetCastleEndingPosition(CastleType.KingSide));
+            _rookStartingPosition = board.GetSquare(_king.GetCastleRookStartingSquare(CastleType.KingSide));
+            _rookEndingPosition = board.GetSquare(_king.GetCastleRookEndingPosition(CastleType.KingSide));
         }
 
         internal override PiecesAffectedByMove GetAffectedPieces()
@@ -32,9 +34,9 @@ namespace ChessCore
             return new PiecesAffectedByMove(_king, null, _rook);
         }
 
-        internal override SquareCoordinate GetMovedPieceEndingSquare()
+        internal override Square GetMovedPieceEndingSquare()
         {
-            return _king.GetCastleEndingPosition(CastleType.KingSide);
+            return _board.GetSquare(_king.GetCastleEndingPosition(CastleType.KingSide));
         }
 
         internal override MoveOperations GetMoveOperations()
@@ -47,7 +49,7 @@ namespace ChessCore
             return ret;
         }
 
-        internal override void OnMovePlayed()
+        protected override void OnMovePlayed()
         {
             _king.OnPieceMoved(_kingEndingPosition);
             _rook.OnPieceMoved(_rookEndingPosition);

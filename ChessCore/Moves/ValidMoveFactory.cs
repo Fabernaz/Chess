@@ -25,8 +25,8 @@ namespace ChessCore
                                           Board board)
         {
             return new EnPassant(startingSquare.Piece as Pawn,
-                                 startingSquare.Coordinate,
-                                 endingSquare.Coordinate,
+                                 startingSquare,
+                                 endingSquare,
                                  board.GetLastMovedPiece() as Pawn,
                                  board.GetLastMove().GetMovedPieceEndingSquare());
         }
@@ -101,9 +101,9 @@ namespace ChessCore
             switch (castleType)
             {
                 case CastleType.KingSide:
-                    return new CastlingKingSide(king, rook);
+                    return new CastlingKingSide(king, rook, board);
                 case CastleType.QueenSide:
-                    return new CastlingQueenSide(king, rook);
+                    return new CastlingQueenSide(king, rook, board);
                 default:
                     throw new NotImplementedException();
             }
@@ -143,13 +143,13 @@ namespace ChessCore
 
             var isValid = IsValidGenericMove(board, startingSquare, endingSquare, startingSquare.Piece, endingSquare.Piece);
             if (isValid)
-                move = new Move(startingSquare.Coordinate,
-                                       endingSquare.Coordinate,
-                                       startingSquare.Piece,
-                                       endingSquare.Piece,
-                                       endingSquare.Piece != null,
-                                       GetAmbiguousMove(board, endingSquare.Coordinate, startingSquare.Piece),
-                                       null);
+                move = new Move(startingSquare,
+                                endingSquare,
+                                startingSquare.Piece,
+                                endingSquare.Piece,
+                                endingSquare.Piece != null,
+                                GetAmbiguousMove(board, endingSquare.Coordinate, startingSquare.Piece),
+                                null);
 
             return isValid;
         }
@@ -165,17 +165,17 @@ namespace ChessCore
 
         #region Move validity
 
-        private bool IsValidGenericMove(Board board, Square startingCoordinate, Square endingCoordinate, Piece movedPiece, Piece capturedPiece)
+        private bool IsValidGenericMove(Board board, Square startingSquare, Square endingSquare, Piece movedPiece, Piece capturedPiece)
         {
-            return IsPossibleMove(board, startingCoordinate.Coordinate, endingCoordinate.Coordinate, movedPiece, capturedPiece)
-                && IsNotCheck(board, startingCoordinate, endingCoordinate, movedPiece);
+            return IsPossibleMove(board, startingSquare, endingSquare, movedPiece, capturedPiece)
+                && IsNotCheck(board, startingSquare, endingSquare, movedPiece);
         }
 
-        private bool IsPossibleMove(Board board, SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece movedPiece, Piece capturedPiece)
+        private bool IsPossibleMove(Board board, Square startingSquare, Square endingSquare, Piece movedPiece, Piece capturedPiece)
         {
             return movedPiece != null
-                && IsAllowedMove(board, startingCoordinate, endingCoordinate, movedPiece, capturedPiece)
-                && IsAllowedCapture(startingCoordinate, endingCoordinate, movedPiece, capturedPiece);
+                && IsAllowedMove(board, startingSquare, endingSquare, movedPiece, capturedPiece)
+                && IsAllowedCapture(startingSquare, endingSquare, movedPiece, capturedPiece);
         }
 
         private bool IsNotCheck(Board board, Square startingCoordinate, Square endingCoordinate, Piece movedPiece)
@@ -212,19 +212,19 @@ namespace ChessCore
                                                        board.GetSquare(endingCoordinate));
         }
 
-        private bool IsAllowedMove(Board board, SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece movedPiece, Piece capturedPiece)
+        private bool IsAllowedMove(Board board, Square startingSquare, Square endingSquare, Piece movedPiece, Piece capturedPiece)
         {
-            return movedPiece.IsPieceMove(startingCoordinate, endingCoordinate, capturedPiece)
-                && InBetweenPiecesValid(board, startingCoordinate, endingCoordinate, movedPiece);
+            return movedPiece.IsPieceMove(startingSquare, endingSquare, capturedPiece)
+                && InBetweenPiecesValid(board, startingSquare, endingSquare, movedPiece);
         }
 
-        private bool InBetweenPiecesValid(Board board, SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece movedPiece)
+        private bool InBetweenPiecesValid(Board board, Square startingSquare, Square endingSquare, Piece movedPiece)
         {
             return movedPiece.CanJumpOverPieces()
-                || !board.IsAnyPieceInBetween(startingCoordinate, endingCoordinate);
+                || !board.IsAnyPieceInBetween(startingSquare, endingSquare);
         }
 
-        private bool IsAllowedCapture(SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Piece movedPiece, Piece capturedPiece)
+        private bool IsAllowedCapture(Square startingSquare, Square endingSquare, Piece movedPiece, Piece capturedPiece)
         {
             return capturedPiece == null
                 || movedPiece.Color.IsOpponentColor(capturedPiece.Color);
