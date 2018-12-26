@@ -43,12 +43,18 @@ namespace ChessCore
                 _whiteTimer.OnMovePlayed();
             }
 
-            moveNumber += 1;
+            moveNumber++;
         }
 
         internal string GetBlackTime()
         {
             return _blackTimer.TimeLeft;
+        }
+
+        internal void OnGameEnded()
+        {
+            _blackTimer.Stop();
+            _whiteTimer.Stop();
         }
 
         internal string GetWhiteTime()

@@ -48,7 +48,7 @@ namespace ChessCore
         {
             return string.Format("{0}. {1} {2}", MoveNumber, 
                                                  WhiteMove, 
-                                                 BlackMove?.ToString() ?? "...");
+                                                 BlackMove?.ToString());
         }
 
         public IEnumerable<string> GetStringExplodedRepresentation()

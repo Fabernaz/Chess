@@ -8,8 +8,12 @@ namespace ChessCore
 {
     internal class PiecesInfluenceManager
     {
+        #region Fields
+
         private readonly PiecesControlManager _controlManager;
         private readonly PiecesMobilityManager _mobilityManager;
+
+        #endregion
 
         #region Constructors
 
@@ -60,9 +64,9 @@ namespace ChessCore
 
         #region Control methods
 
-        internal bool IsControlledByOppositeColor(Square position, Color color)
+        internal bool IsControlledByColor(Square position, Color color)
         {
-            return _controlManager.IsControlledByOppositeColor(position, color);
+            return _controlManager.IsControlledByColor(position, color);
         }
 
         internal ISet<SquareCoordinate> GetOpponentControlAfterMove(Square startingCoordinate, Square endingCoordinate, Color color)
@@ -82,9 +86,22 @@ namespace ChessCore
 
         #endregion
 
+        #region Mobility methods
+
+        internal bool HasAnyAvailableMove(Color color)
+        {
+            return _mobilityManager.HasAnyAvailableMove(color);
+        }
+
+        #endregion
+
+        #region Temporary move
+
         internal void PlayTemporaryMove(TemporaryMoveDisposable disp)
         {
             _controlManager.PlayTemporaryMove(disp);
         }
+
+        #endregion
     }
 }

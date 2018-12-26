@@ -41,6 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Board\EndGameRules\EndGameRules.cs" />
+    <Compile Include="Board\EndGameRules\GameEndedReasonEventArgs.cs" />
+    <Compile Include="Board\EndGameRules\ThreefoldRepetitionPositionUnit.cs" />
     <Compile Include="Board\Square.cs" />
     <Compile Include="Board\Board.cs" />
     <Compile Include="Board\BoardFactory.cs" />

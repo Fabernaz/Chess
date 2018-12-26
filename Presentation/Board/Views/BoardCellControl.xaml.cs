@@ -72,7 +72,7 @@ namespace Presentation
         {
             base.OnMouseDown(e);
 
-            if (e.LeftButton == MouseButtonState.Pressed && HasRightColorPiece())
+            if (e.LeftButton == MouseButtonState.Pressed && CanMove())
             {
                 _board.MoveStarted(_vm);
                 DragDrop.DoDragDrop(this, DataContext, DragDropEffects.All);
@@ -93,11 +93,17 @@ namespace Presentation
                 _cursor.Dispose();
         }
 
-        private bool HasRightColorPiece()
+        private bool CanMove()
         {
             var vm = DataContext as SquareVM;
-            return vm.Piece != null
-                && vm.Piece.Color == vm.Board.NextMoveTurn;
+            return HasRightColorPiece(vm)
+                && !vm.Board.GameEnded;
+        }
+
+        private bool HasRightColorPiece(SquareVM squareVM)
+        {
+            return squareVM.Piece != null
+                && squareVM.Piece.Color == squareVM.Board.NextMoveTurn;
         }
 
         private void UserControl_GiveFeedback(object sender, GiveFeedbackEventArgs e)

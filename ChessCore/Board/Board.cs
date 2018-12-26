@@ -14,15 +14,29 @@ namespace ChessCore
         #region Fields
 
         private readonly IDictionary<Color, King> _kingsDict;
-        private readonly IDictionary<SquareCoordinate, Square> _board;
-        private readonly IDictionary<Color, IList<Piece>> _capturedPieces;
+        private readonly IDictionary<SquareCoordinate, Square> _position;
         private readonly IDictionary<Color, IList<Piece>> _playingPieces;
-
         private readonly ValidMoveFactory _moveFactory;
         private readonly TimerManager _timerManager;
-        private readonly MovesSet _movesRegister;
+        private readonly MovesSet _movesSet;
         private readonly PiecesInfluenceManager _piecesInfluenceManager;
         private readonly InfoAsker<PromoteTo> _infoAsker;
+        private EndGameRules _endGameRules;
+        private bool _gameEnded;
+
+        #endregion
+
+        #region Indexers
+
+        public Square this[SquareCoordinate coordinate]
+        {
+            get { return _position[coordinate]; }
+        }
+
+        public Square this[int rank, int file]
+        {
+            get { return _position[new SquareCoordinate(rank, file)]; }
+        }
 
         #endregion
 
@@ -38,6 +52,7 @@ namespace ChessCore
         public event EventHandler BlackTimerChanged;
         public event EventHandler WhiteTimerChanged;
         public event EventHandler AskForPieceEvent;
+        public event EventHandler<GameEndedReasonEventArgs> GameEndedEvent;
 
         #endregion
 
@@ -54,24 +69,19 @@ namespace ChessCore
 
         private Board()
         {
-            _capturedPieces = new Dictionary<Color, IList<Piece>>
-            {
-                { Color.Black, new List<Piece>() },
-                { Color.White, new List<Piece>() }
-            };
             _playingPieces = new Dictionary<Color, IList<Piece>>
             {
                 { Color.Black, new List<Piece>() },
                 { Color.White, new List<Piece>() }
             };
 
-            _movesRegister = new MovesSet();
+            _movesSet = new MovesSet();
             _kingsDict = new Dictionary<Color, King>();
 
             NextMoveTurn = Color.White;
             _infoAsker = GetPieceAsker();
             _moveFactory = new ValidMoveFactory(_infoAsker);
-            _board = CreateBoard();
+            _position = CreatePosition();
             _timerManager = InitTimeManager();
             _piecesInfluenceManager = new PiecesInfluenceManager(this);
         }
@@ -79,6 +89,17 @@ namespace ChessCore
         #endregion
 
         #region Init
+
+        private EndGameRules InitEndGameRules()
+        {
+            var ret = new EndGameRules(this, _timerManager, _movesSet, _piecesInfluenceManager);
+            ret.GameEndedEvent += (sender, e) =>
+            {
+                _gameEnded = true;
+                GameEndedEvent?.Invoke(this, e);
+            };
+            return ret;
+        }
 
         private InfoAsker<PromoteTo> GetPieceAsker()
         {
@@ -108,7 +129,7 @@ namespace ChessCore
             return ret;
         }
 
-        private IDictionary<SquareCoordinate, Square> CreateBoard()
+        private IDictionary<SquareCoordinate, Square> CreatePosition()
         {
             var ret = new Dictionary<SquareCoordinate, Square>();
 
@@ -147,6 +168,7 @@ namespace ChessCore
                 AddPiece(pair);
 
             _piecesInfluenceManager.AddPieces(allPieces);
+            _endGameRules = InitEndGameRules();
         }
 
         private bool IsValidPiecesSet(IEnumerable<Piece> pieces)
@@ -178,7 +200,7 @@ namespace ChessCore
 
         internal Move GetLastMove()
         {
-            return _movesRegister.GetLastMove();
+            return _movesSet.GetLastMove();
         }
 
         internal Piece GetLastMovedPiece()
@@ -188,28 +210,28 @@ namespace ChessCore
 
         internal bool CanPieceOfColorGoToSquare(SquareCoordinate coordinate, Color color)
         {
-            return _board[coordinate].Piece == null
-                || _board[coordinate].Piece.Color.IsOpponentColor(color);
+            return _position[coordinate].Piece == null
+                || _position[coordinate].Piece.Color.IsOpponentColor(color);
         }
 
         internal bool IsAnyPieceInSquare(SquareCoordinate coordinate)
         {
-            return _board[coordinate].ContainsPiece();
+            return _position[coordinate].ContainsPiece();
         }
 
         internal bool IsAnyPieceInSquare(int rank, int file)
         {
-            return _board[new SquareCoordinate(rank, file)].ContainsPiece();
+            return _position[new SquareCoordinate(rank, file)].ContainsPiece();
         }
 
         internal bool IsAnyOpponentPieceInSquare(SquareCoordinate coordinate, Color color)
         {
-            return _board[coordinate].ContainsOpponentPiece(color);
+            return _position[coordinate].ContainsOpponentPiece(color);
         }
 
         public IEnumerable<Square> GetSquares()
         {
-            return _board.Select(x => x.Value);
+            return _position.Select(x => x.Value);
         }
 
         private void AddPiece(PieceCoordinatePair pair)
@@ -217,15 +239,10 @@ namespace ChessCore
             if (pair.Piece == null)
                 return;
 
-            pair.Piece.CurrentSquare = GetSquare(pair.Coordinate);
+            pair.Piece.CurrentSquare = this[pair.Coordinate];
 
             _playingPieces[pair.Piece.Color].Add(pair.Piece);
-            _board[pair.Piece.CurrentSquare.Coordinate].Piece = pair.Piece;
-        }
-
-        internal Square GetSquare(SquareCoordinate coordinate)
-        {
-            return _board[coordinate];
+            _position[pair.Piece.CurrentSquare.Coordinate].Piece = pair.Piece;
         }
 
         #endregion
@@ -245,20 +262,28 @@ namespace ChessCore
 
             move.PlayMove();
             _piecesInfluenceManager.OnMovePlayed(operations);
-            _movesRegister.OnMovePlayed(move);
+            _movesSet.OnMovePlayed(move);
             _timerManager.OnMovePlayed();
 
-            OpponentInCheck(move);
-            FlipNextMoveTurn();
+            _endGameRules.OnMovePlayed(move);
+            if (!_gameEnded)
+                FlipNextMoveTurn();
+
+            UpdateMoveWithCheckInformation(move);
 
             MovePlayed?.Invoke(this, new EventArgs());
         }
 
-        private void OpponentInCheck(Move move)
+        private void UpdateMoveWithCheckInformation(Move move)
         {
             var operations = move.GetMoveOperations();
-            var opponentColor = operations.MovingColor.OpponentColor;
-            move.IsCheck = _piecesInfluenceManager.IsControlledByOppositeColor(GetKingSquare(opponentColor), opponentColor);
+            if (IsInCheck(operations.MovingColor.OpponentColor))
+            {
+                if (_gameEnded)
+                    move.IsCheckMate = true;
+                else
+                    move.IsCheck = true;
+            };
         }
 
         private void PerformMoveOperations(MoveOperations operations)
@@ -276,14 +301,13 @@ namespace ChessCore
 
         private void MovePiece(PieceMoveInfo move)
         {
-            _board[move.EndingSquare.Coordinate].Piece = move.MovedPiece;
-            _board[move.StartingSquare.Coordinate].Piece = null;
+            _position[move.EndingSquare.Coordinate].Piece = move.MovedPiece;
+            _position[move.StartingSquare.Coordinate].Piece = null;
         }
 
         private void RemovePiece(Piece piece)
         {
-            _board[piece.CurrentSquare.Coordinate].Piece = null;
-            _capturedPieces[piece.Color].Add(piece);
+            _position[piece.CurrentSquare.Coordinate].Piece = null;
             _playingPieces[piece.Color].Remove(piece);
         }
 
@@ -304,21 +328,40 @@ namespace ChessCore
 
         internal IEnumerable<Piece> GetAllPlayingPiecesOfSameTypeAndColor(Type pieceType, Color color)
         {
-            return _board.Select(x => x.Value.Piece)
+            return _position.Select(x => x.Value.Piece)
                          .Where(p => p != null)
                          .Where(p => p.GetType() == pieceType)
                          .Where(piece => piece.Color == color);
         }
 
-        internal IEnumerable<Square> GetAllBoardSquares()
+        internal IEnumerable<Piece> GetAllPiecesOfColor(Color color)
         {
-            return _board.Select(x => x.Value);
+            return _position.Select(x => x.Value.Piece)
+                         .Where(p => p != null)
+                         .Where(piece => piece.Color == color);
         }
 
-        internal bool IsControlledByOppositeColor(SquareCoordinate coordinate, Color color)
+        internal IEnumerable<Piece> GetAllPieces()
         {
-            return _piecesInfluenceManager.IsControlledByOppositeColor(GetSquare(coordinate), color);
+            return _position.Select(x => x.Value.Piece)
+                            .Where(p => p != null);
         }
+
+        internal IEnumerable<Square> GetAllBoardSquares()
+        {
+            return _position.Select(x => x.Value);
+        }
+
+        internal bool IsControlledByColor(SquareCoordinate coordinate, Color color)
+        {
+            return _piecesInfluenceManager.IsControlledByColor(this[coordinate], color);
+        }
+
+        internal bool IsInCheck(Color color)
+        {
+            return IsControlledByColor(GetKingSquare(color).Coordinate, color.OpponentColor);
+        }
+
 
         internal bool IsInOpponentControlAfterMove(Square startingCoordinate, Square endingCoordinate, Square square)
         {
@@ -345,7 +388,7 @@ namespace ChessCore
 
         internal Square GetKingSquare(Color color)
         {
-            return GetSquare(GetKing(color).CurrentSquare.Coordinate);
+            return this[GetKing(color).CurrentSquare.Coordinate];
         }
 
         internal King GetKing(Color color)
@@ -355,7 +398,7 @@ namespace ChessCore
 
         public IEnumerable<MovePair> GetAllMovesPlayed()
         {
-            return _movesRegister.GetAllMoves();
+            return _movesSet.GetAllMoves();
         }
     }
 }

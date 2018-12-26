@@ -88,11 +88,6 @@
 
         #endregion
 
-        public override string ToString()
-        {
-            return _Color == PieceColor.White ? "White" : "Black";
-        }
-
         private enum PieceColor
         {
             White,

@@ -22,6 +22,7 @@ namespace Presentation
         private Board _board;
         private string _blackTime;
         private string _whiteTime;
+        private bool _gameEnded;
 
         public IEnumerable<SquareVM> Cells { get; }
 
@@ -39,6 +40,12 @@ namespace Presentation
         {
             get { return _whiteTime; }
             private set { this.RaiseAndSetIfChanged(ref _whiteTime, value); }
+        }
+
+        public bool GameEnded
+        {
+            get { return _gameEnded; }
+            private set { this.RaiseAndSetIfChanged(ref _gameEnded, value); }
         }
 
         public BoardVM(Board board)
@@ -61,9 +68,16 @@ namespace Presentation
             };
             WhiteTime = _board.GetWhiteTime();
 
+            _board.GameEndedEvent += OnGameEnded;
+
             Cells = board.GetSquares()
                          .Select(m => new SquareVM(m, this))
                          .ToList();
+        }
+
+        private void OnGameEnded(object sender, GameEndedReasonEventArgs e)
+        {
+            GameEnded = true;
         }
 
         private void OnAskForPieceEvent(object sender, EventArgs e)

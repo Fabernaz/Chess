@@ -45,7 +45,7 @@ namespace ChessCore
         private void AddPiece(Piece addedPiece)
         {
             var controlledSquares = addedPiece.GetControlledSquares(_board)
-                                              .Select(p => _board.GetSquare(p));
+                                              .Select(coordinate => _board[coordinate]);
 
             _control[addedPiece.Color].Add(addedPiece, new HashSet<Square>());
 
@@ -132,7 +132,7 @@ namespace ChessCore
             var colorControlList = _controlCardinality[move.MovedPiece.Color];
             var previouslyControlledSquares = _control[move.MovedPiece.Color][move.MovedPiece];
             var newControlledSquares = move.MovedPiece.GetControlledSquares(_board)
-                                                      .Select(p => _board.GetSquare(p));
+                                                      .Select(coordinate => _board[coordinate]);
 
             RemovePreviousControlledSquares(move.MovedPiece, previouslyControlledSquares);
             AddNewControlledSquares(move.MovedPiece, newControlledSquares);
@@ -206,9 +206,9 @@ namespace ChessCore
             ResetSquaresControl();
         }
 
-        internal bool IsControlledByOppositeColor(Square position, Color color)
+        internal bool IsControlledByColor(Square position, Color color)
         {
-            return _controlledSquares[color.OpponentColor].Contains(position);
+            return _controlledSquares[color].Contains(position);
         }
 
         internal void PlayTemporaryMove(TemporaryMoveDisposable disp)
@@ -241,7 +241,7 @@ namespace ChessCore
             foreach (var piece in influencedPieces.Where(p => !p.Captured).ToList())
             {
                 var newControlledSquares = piece.GetControlledSquares(_board)
-                                             .Select(p => _board.GetSquare(p));
+                                             .Select(coordinate => _board[coordinate]);
                 var previouslyControlledSquares = _control[piece.Color][piece];
 
                 ReplaceSquareInPiecesControlDict(piece, newControlledSquares, previouslyControlledSquares);

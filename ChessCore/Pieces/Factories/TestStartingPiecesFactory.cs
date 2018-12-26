@@ -23,10 +23,6 @@ namespace ChessCore
             ret.Add(new PieceCoordinatePair(new King(Color.Black),
                                             new SquareCoordinate(8, 7)));
             ret.Add(new PieceCoordinatePair(new Pawn(Color.Black),
-                                                new SquareCoordinate(7, 6)));
-            ret.Add(new PieceCoordinatePair(new Pawn(Color.Black),
-                                                new SquareCoordinate(7, 7)));
-            ret.Add(new PieceCoordinatePair(new Pawn(Color.Black),
                                                 new SquareCoordinate(7, 8)));
 
             return ret;

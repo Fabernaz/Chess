@@ -13,7 +13,7 @@ namespace Presentation
     {
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.Register<IStartingPiecesSetFactory, ClassicStartingPiecesSetFactory>();
+            containerRegistry.Register<IStartingPiecesSetFactory, TestStartingPiecesFactory>();
             containerRegistry.Register<IBoardFactory, BoardFactory>();
             containerRegistry.Register<IImagesFactory, ImagesFactory>();
         }

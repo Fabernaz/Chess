@@ -20,15 +20,15 @@ namespace ChessCore
             : base(true, 
                    king,
                    null,
-                   board.GetSquare(king.GetCastleStartingPosition()),
-                   board.GetSquare(king.GetCastleEndingPosition(type)),
+                   board[king.GetCastleStartingPosition()],
+                   board[king.GetCastleEndingPosition(type)],
                    null)
         {
             _type = type;
             _board = board;
             _rook = rook;
-            _rookStartingPosition = board.GetSquare(King.GetCastleRookStartingSquare(type));
-            _rookEndingPosition = board.GetSquare(King.GetCastleRookEndingPosition(type));
+            _rookStartingPosition = board[King.GetCastleRookStartingSquare(type)];
+            _rookEndingPosition = board[King.GetCastleRookEndingPosition(type)];
         }
 
         internal override MoveOperations GetMoveOperations()

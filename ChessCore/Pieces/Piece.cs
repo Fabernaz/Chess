@@ -62,15 +62,15 @@ namespace ChessCore
 
         public IEnumerable<Piece> GetAttackedPieces(Board board)
         {
-            return _availableMoves.Where(p => board.IsAnyOpponentPieceInSquare(p, Color))
-                                  .Select(p => board.GetSquare(p).Piece);
+            return _availableMoves.Where(coordinate => board.IsAnyOpponentPieceInSquare(coordinate, Color))
+                                  .Select(coordinate => board[coordinate].Piece);
         }
 
         internal void ResetAvailableMoves(Board board)
         {
             _availableMoves = CurrentSquare != null
                 ? GetAvailableMoves(board)
-                         .Where(s => !board.WouldBeInCheckAfterMove(CurrentSquare, board.GetSquare(s)))
+                         .Where(coordinate => !board.WouldBeInCheckAfterMove(CurrentSquare, board[coordinate]))
                 : new List<SquareCoordinate>();
         }
 

@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ChessCore
 {
     public class MovesSet
     {
-        private readonly List<MovePair> _moves;
+        private readonly List<MovePair> _movePairs;
         private Color _currentPieceMoveColor;
-        private MovePair _currentMove;
+        private MovePair _currentMovePair;
         private Move _lastMoveAdded;
+
+        public int NoPawnOrCaptureMovesNumber { get; private set; }
 
         internal MovesSet()
         {
-            _moves = new List<MovePair>();
+            _movePairs = new List<MovePair>();
             _currentPieceMoveColor = Color.White;
         }
 
@@ -30,25 +33,51 @@ namespace ChessCore
         private void RegisterMove(Move move)
         {
             if (_currentPieceMoveColor.IsWhite)
-                AddNewMovePair(move);
-            else if (_currentPieceMoveColor.IsBlack)
-                UpdateBlackInLastMove(move);
+                OnWhiteMoved(move);
             else
-                throw new NotImplementedException();
+                OnBlackMoved(move);
 
             _lastMoveAdded = move;
         }
 
-        private void UpdateBlackInLastMove(Move move)
+        private void OnWhiteMoved(Move move)
         {
-            _currentMove.BlackMove = move;
-            _currentMove = null;
+            _currentMovePair = new MovePair(_movePairs.Count + 1, move);
+            _movePairs.Add(_currentMovePair);
         }
 
-        private void AddNewMovePair(Move move)
+        private void OnBlackMoved(Move move)
         {
-            _currentMove = new MovePair(_moves.Count + 1, move);
-            _moves.Add(_currentMove);
+            UpdateBlackInLastMove(move);
+            RegisterLastMovePairFor50Rule();
+        }
+
+        private void UpdateBlackInLastMove(Move move)
+        {
+            _currentMovePair.BlackMove = move;
+        }
+
+        private void RegisterLastMovePairFor50Rule()
+        {
+            if (_currentPieceMoveColor == Color.White)
+                return;
+
+            if (MovePairBreaks50Rule(_currentMovePair))
+                NoPawnOrCaptureMovesNumber = 0;
+            else
+                NoPawnOrCaptureMovesNumber++;
+        }
+
+        private bool MovePairBreaks50Rule(MovePair movePair)
+        {
+            return MoveBreaks50Rule(_currentMovePair.WhiteMove)
+                || MoveBreaks50Rule(_currentMovePair.BlackMove);
+        }
+
+        private bool MoveBreaks50Rule(Move move)
+        {
+            return move.MovedPiece is Pawn
+                || move.IsCapture;
         }
 
         private void FlipColor()
@@ -58,7 +87,7 @@ namespace ChessCore
 
         internal IEnumerable<MovePair> GetAllMoves()
         {
-            return _moves;
+            return _movePairs;
         }
     }
 }

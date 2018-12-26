@@ -135,7 +135,7 @@ namespace ChessCore
 
         private Move GetCastleMove(Board board, King king, CastleType castleType)
         {
-            var rook = board.GetSquare(king.GetCastleRookStartingSquare(castleType)).Piece as Rook;
+            var rook = board[king.GetCastleRookStartingSquare(castleType)].Piece as Rook;
 
             return new Castle(king, rook, board, castleType);
         }
@@ -217,17 +217,17 @@ namespace ChessCore
         private bool IsNotBreakingAbsolutePin(Board board, SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Color movingSide)
         {
             var kingPosition = board.GetKingSquare(movingSide);
-            return !board.IsInOpponentControlAfterMove(board.GetSquare(startingCoordinate),
-                                                       board.GetSquare(endingCoordinate),
+            return !board.IsInOpponentControlAfterMove(board[startingCoordinate],
+                                                       board[endingCoordinate],
                                                        kingPosition);
         }
 
         private bool IsNotCheckOnKingMove(Board board, SquareCoordinate startingCoordinate, SquareCoordinate endingCoordinate, Color kingColor)
         {
-            return !board.IsControlledByOppositeColor(endingCoordinate, kingColor)
-                && !board.IsInOpponentControlAfterMove(board.GetSquare(startingCoordinate),
-                                                       board.GetSquare(endingCoordinate),
-                                                       board.GetSquare(endingCoordinate));
+            return !board.IsControlledByColor(endingCoordinate, kingColor.OpponentColor)
+                && !board.IsInOpponentControlAfterMove(board[startingCoordinate],
+                                                       board[endingCoordinate],
+                                                       board[endingCoordinate]);
         }
 
         private bool IsAllowedMove(Board board, Square startingSquare, Square endingSquare, Piece movedPiece, Piece capturedPiece)

@@ -28,4 +28,22 @@ namespace ChessCore
         Bishop,
         Knight
     }
+
+    public enum GameEndedReason
+    {
+        CheckMate,
+        TimeUp,
+        Abandon,
+        Resign,
+        StaleMate,
+        FiftyRule,
+        ThreefoldRepetition
+    }
+
+    public enum GameOutcome
+    {
+        WhiteWins,
+        Draw,
+        BlackWins
+    }
 }

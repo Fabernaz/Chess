@@ -37,6 +37,8 @@ namespace ChessCore
 
         internal Piece CapturedPiece { get; }
 
+        internal Color MovingColor { get; }
+
         #endregion
 
         #region Constructors
@@ -48,6 +50,7 @@ namespace ChessCore
             EndingSquare = endingSquare;
             StartingSquare = startingSquare;
             CapturedPiece = capturedPiece;
+            MovingColor = movedPiece.Color;
             _ambiguousMoveStartingSquare = ambiguousMoveStartingSquare;
         }
 

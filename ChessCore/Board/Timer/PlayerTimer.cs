@@ -76,13 +76,18 @@ namespace ChessCore
             AlternateActivity();
         }
 
+        internal void Stop()
+        {
+            _timer.Stop();
+        }
+
         internal void OnMovePlayed()
         {
             AlternateActivity();
 
             if (!_timer.Enabled)
             {
-                _moveNumber += 1;
+                _moveNumber++;
                 IncrementOnMove();
                 ResetTimeLeft();
             }
@@ -90,7 +95,7 @@ namespace ChessCore
 
         internal void FirstGameMovePlayed()
         {
-            _moveNumber += 1;
+            _moveNumber++;
         }
 
         private void IncrementOnMove()

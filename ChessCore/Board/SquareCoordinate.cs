@@ -20,10 +20,12 @@ namespace ChessCore
         {
             return obj is SquareCoordinate && this == (SquareCoordinate)obj;
         }
+
         public override int GetHashCode()
         {
             return Rank.GetHashCode() ^ File.GetHashCode();
         }
+
         public static bool operator ==(SquareCoordinate x, SquareCoordinate y)
         {
             return x.Rank == y.Rank && x.File == y.File;

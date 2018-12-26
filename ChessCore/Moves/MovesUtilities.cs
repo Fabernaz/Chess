@@ -194,7 +194,7 @@ namespace ChessCore
             if (king.HasBeenMoved)
                 return false;
 
-            var rookSquare = board.GetSquare(king.GetCastleRookStartingSquare(castleType));
+            var rookSquare = board[king.GetCastleRookStartingSquare(castleType)];
             return rookSquare.Piece != null
                 && !rookSquare.Piece.HasBeenMoved;
         }
@@ -202,7 +202,7 @@ namespace ChessCore
         private static bool CastlingSquaresAreNotControlledByOpponent(King king, Board board, CastleType castleType)
         {
             foreach (var square in king.GetCastlingSquares(castleType))
-                if (board.IsInOpponentControl(board.GetSquare(square), king.Color))
+                if (board.IsInOpponentControl(board[square], king.Color))
                     return false;
 
             return true;
@@ -311,42 +311,42 @@ namespace ChessCore
 
             //Upper left
             if (TryGetNewPosition(startingCoordinate.Rank + 1, startingCoordinate.File - 1, out newPos))
-                if (!board.IsControlledByOppositeColor(newPos.Value, king.Color)
+                if (!board.IsControlledByColor(newPos.Value, king.Color.OpponentColor)
                     && board.CanPieceOfColorGoToSquare(newPos.Value, king.Color))
                     ret.Add(newPos.Value);
             //Upper middle
             if (TryGetNewPosition(startingCoordinate.Rank + 1, startingCoordinate.File, out newPos))
-                if (!board.IsControlledByOppositeColor(newPos.Value, king.Color)
+                if (!board.IsControlledByColor(newPos.Value, king.Color.OpponentColor)
                     && board.CanPieceOfColorGoToSquare(newPos.Value, king.Color))
                     ret.Add(newPos.Value);
             //Upper right
             if (TryGetNewPosition(startingCoordinate.Rank + 1, startingCoordinate.File + 1, out newPos))
-                if (!board.IsControlledByOppositeColor(newPos.Value, king.Color)
+                if (!board.IsControlledByColor(newPos.Value, king.Color.OpponentColor)
                     && board.CanPieceOfColorGoToSquare(newPos.Value, king.Color))
                     ret.Add(newPos.Value);
             //Middle right
             if (TryGetNewPosition(startingCoordinate.Rank, startingCoordinate.File + 1, out newPos))
-                if (!board.IsControlledByOppositeColor(newPos.Value, king.Color)
+                if (!board.IsControlledByColor(newPos.Value, king.Color.OpponentColor)
                     && board.CanPieceOfColorGoToSquare(newPos.Value, king.Color))
                     ret.Add(newPos.Value);
             //Middle left
             if (TryGetNewPosition(startingCoordinate.Rank, startingCoordinate.File - 1, out newPos))
-                if (!board.IsControlledByOppositeColor(newPos.Value, king.Color)
+                if (!board.IsControlledByColor(newPos.Value, king.Color.OpponentColor)
                     && board.CanPieceOfColorGoToSquare(newPos.Value, king.Color))
                     ret.Add(newPos.Value);
             //Bottom right
             if (TryGetNewPosition(startingCoordinate.Rank - 1, startingCoordinate.File + 1, out newPos))
-                if (!board.IsControlledByOppositeColor(newPos.Value, king.Color)
+                if (!board.IsControlledByColor(newPos.Value, king.Color.OpponentColor)
                     && board.CanPieceOfColorGoToSquare(newPos.Value, king.Color))
                     ret.Add(newPos.Value);
             //Bottom middle
             if (TryGetNewPosition(startingCoordinate.Rank - 1, startingCoordinate.File, out newPos))
-                if (!board.IsControlledByOppositeColor(newPos.Value, king.Color)
+                if (!board.IsControlledByColor(newPos.Value, king.Color.OpponentColor)
                     && board.CanPieceOfColorGoToSquare(newPos.Value, king.Color))
                     ret.Add(newPos.Value);
             //Bottom left
             if (TryGetNewPosition(startingCoordinate.Rank - 1, startingCoordinate.File - 1, out newPos))
-                if (!board.IsControlledByOppositeColor(newPos.Value, king.Color)
+                if (!board.IsControlledByColor(newPos.Value, king.Color.OpponentColor)
                     && board.CanPieceOfColorGoToSquare(newPos.Value, king.Color))
                     ret.Add(newPos.Value);
 

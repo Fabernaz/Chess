@@ -95,6 +95,17 @@ namespace ChessCore
 
         #region Mobility
 
+        internal bool HasAnyAvailableMove(Color color)
+        {
+            var allColorPieces = _board.GetAllPiecesOfColor(color);
+
+            foreach (var piece in allColorPieces)
+                if (piece.GetAvailableMoves().Any())
+                    return true;
+
+            return false;
+        }
+
         private void ResetPiecesMobility(Piece movedPiece, Square startingSquare, Square endingSquare)
         {
             HandlePawnMobility(movedPiece, startingSquare.Coordinate, endingSquare.Coordinate);
@@ -121,13 +132,13 @@ namespace ChessCore
                 .Where(p => !p.Equals(movedPiece));
             allInfluencedPieces.AddRange(piecesControllingMovingSquares);
 
-            var attackedPieces = newAvailableMoves.Select(p => _board.GetSquare(p))
+            var attackedPieces = newAvailableMoves.Select(coordinate => _board[coordinate])
                                            .Where(p => p.ContainsPiece())
                                            .Where(p => p.Piece.Color.IsOpponentColor(movedPiece.Color))
                                            .Select(p => p.Piece);
             allInfluencedPieces.AddRange(attackedPieces);
 
-            var previouslyAttackedPieces = previouslyAvailableMoves.Select(p => _board.GetSquare(p))
+            var previouslyAttackedPieces = previouslyAvailableMoves.Select(coordinate => _board[coordinate])
                                            .Where(p => p.ContainsPiece())
                                            .Where(p => p.Piece.Color.IsOpponentColor(movedPiece.Color))
                                            .Select(p => p.Piece);
