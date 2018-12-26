@@ -30,7 +30,7 @@ namespace ChessCore
                 ;
         }
 
-        public override string GetMoveRepresentation()
+        public override string GetNotation()
         {
             return Resource.BishopLetter;
         }

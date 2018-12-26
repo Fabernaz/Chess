@@ -1,65 +1,88 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChessCore
 {
-    public class Move : MoveBase
+    public class Move
     {
+        #region Notation consts
+
+        protected const char CHECK_NOTATION = '+';
+        protected const char CHECK_MATE_NOTATION = '#';
+        protected const char CAPTURE_NOTATION = 'x';
+
+        #endregion
+
         #region Fields
 
-        private readonly Move _ambiguousMove;
-        private readonly Piece _promotedTo;
-        private readonly Square _startingSquare;
-        private readonly Square _endingSquare;
-        private readonly Piece _movedPiece;
-        private readonly Piece _capturedPiece;
-        private readonly PieceMove _moveInfo;
+        protected readonly Square _ambiguousMoveStartingSquare;
+
+        #endregion
+
+        #region Properties
+
+        internal Square StartingSquare { get; }
+
+        internal Square EndingSquare { get; }
+
+        internal bool IsCheck { get; set; }
+
+        internal bool IsCheckMate { get; set; }
+
+        internal bool Played { get; private set; }
+
+        internal virtual bool IsCapture { get; }
+
+        internal Piece MovedPiece { get; }
+
+        internal Piece CapturedPiece { get; }
 
         #endregion
 
         #region Constructors
 
-        internal Move(Square startingCoordinate,
-                      Square endingCoordinate,
-                      Piece movedPiece,
-                      Piece capturedPiece,
-                      bool isCapture,
-                      Move ambiguousMove,
-                      Piece promotedTo)
-            : base(isCapture)
+        public Move(bool isCapture, Piece movedPiece, Piece capturedPiece, Square startingSquare, Square endingSquare, Square ambiguousMoveStartingSquare)
         {
-            _startingSquare = startingCoordinate;
-            _endingSquare = endingCoordinate;
-            _movedPiece = movedPiece;
-            _capturedPiece = capturedPiece;
-            _ambiguousMove = ambiguousMove;
-            _promotedTo = promotedTo;
-
-            _moveInfo = new PieceMove(_startingSquare,
-                                     _endingSquare,
-                                     _movedPiece,
-                                     _capturedPiece);
+            IsCapture = isCapture;
+            MovedPiece = movedPiece;
+            EndingSquare = endingSquare;
+            StartingSquare = startingSquare;
+            CapturedPiece = capturedPiece;
+            _ambiguousMoveStartingSquare = ambiguousMoveStartingSquare;
         }
+
+        public Move(Square startingSquare, Square endingSquare, Square ambiguousMoveStartingSquare)
+            :this(endingSquare.ContainsPiece(),
+                  startingSquare.Piece,
+                  endingSquare.Piece,
+                  startingSquare,
+                  endingSquare,
+                  ambiguousMoveStartingSquare)
+        { }
 
         #endregion
 
-        #region Play
+        #region Play move
 
-        protected override void OnMovePlayed()
+        internal void PlayMove()
         {
-            _movedPiece.OnPieceMoved(_endingSquare);
-            _capturedPiece?.OnPieceCaptured();
+            OnMovePlayed();
+
+            Played = true;
         }
 
-        internal override MoveOperations GetMoveOperations()
+        protected virtual void OnMovePlayed()
         {
-            var ret = new MoveOperations();
+            MovedPiece.OnPieceMoved(EndingSquare);
+            CapturedPiece?.OnPieceCaptured();
+        }
+
+        internal virtual MoveOperations GetMoveOperations()
+        {
+            var ret = new MoveOperations(MovedPiece.Color);
             if (IsCapture)
-                ret.CapturedPieces.Add(_capturedPiece);
-            ret.MovedPieces.Add(_moveInfo);
+                ret.CapturedPieces.Add(CapturedPiece);
+            ret.MovedPieces.Add(new PieceMoveInfo(MovedPiece, StartingSquare, EndingSquare));
             return ret;
         }
 
@@ -67,78 +90,93 @@ namespace ChessCore
 
         #region Notation
 
+        protected string GetCheckNotation()
+        {
+            return IsCheckMate ?
+                CHECK_MATE_NOTATION.ToString() :
+                IsCheck ? CHECK_NOTATION.ToString() : String.Empty;
+        }
+
+        protected string GetCaptureNotation(bool isCapture)
+        {
+            return isCapture ?
+                CAPTURE_NOTATION.ToString()
+                : String.Empty;
+        }
+
+        protected string GetDisambiguating()
+        {
+            if (_ambiguousMoveStartingSquare == null)
+                return String.Empty;
+            else if (_ambiguousMoveStartingSquare.Coordinate.File == StartingSquare.Coordinate.File)
+                return StartingSquare.Coordinate.Rank.ToString();
+            else
+                return MoveUtilities.GetFileFromInt(StartingSquare.Coordinate.File);
+        }
+
+        protected string GetPieceNotation()
+        {
+            var startingFile = MoveUtilities.GetFileFromInt(StartingSquare.Coordinate.File);
+            return MovedPiece is Pawn && IsCapture
+                ? startingFile
+                : MovedPiece.GetNotation();
+        }
+
         public override string ToString()
         {
             var piece = GetPieceNotation();
-            var endingFile = MoveUtilities.GetFileFromInt(_endingSquare.Coordinate.File);
-            var rank = _endingSquare.Coordinate.Rank;
-            var isCapture = GetCaptureRepresentation(IsCapture);
-            var check = GetIsCheckNotation();
+            var endingFile = MoveUtilities.GetFileFromInt(EndingSquare.Coordinate.File);
+            var rank = EndingSquare.Coordinate.Rank;
+            var isCapture = GetCaptureNotation(IsCapture);
+            var check = GetCheckNotation();
             var disambiguating = GetDisambiguating();
-            var promotion = GetPromotion();
 
-            return string.Format("{0}{1}{2}{3}{4}{5}{6}", piece,
-                                                          disambiguating,
-                                                          isCapture,
-                                                          endingFile,
-                                                          rank,
-                                                          promotion,
-                                                          check);
-        }
-
-        private string GetPromotion()
-        {
-            return _promotedTo == null
-                ? String.Empty
-                : _promotedTo.GetMoveRepresentation();
-        }
-
-        private string GetDisambiguating()
-        {
-            if (_ambiguousMove == null)
-                return String.Empty;
-            else if (_ambiguousMove._startingSquare.Coordinate.Rank == _startingSquare.Coordinate.Rank)
-                return MoveUtilities.GetFileFromInt(_startingSquare.Coordinate.File);
-            else
-                return _startingSquare.Coordinate.Rank.ToString();
-        }
-
-        private string GetPieceNotation()
-        {
-            var startingFile = MoveUtilities.GetFileFromInt(_startingSquare.Coordinate.File);
-            return _movedPiece is Pawn && IsCapture
-                ? startingFile
-                : _movedPiece.GetMoveRepresentation();
+            return string.Format("{0}{1}{2}{3}{4}{5}", piece,
+                                                       disambiguating,
+                                                       isCapture,
+                                                       endingFile,
+                                                       rank,
+                                                       check);
         }
 
         #endregion
 
         #region Helpers
 
-        internal override PiecesAffectedByMove GetAffectedPieces()
-        {
-            return new PiecesAffectedByMove(_movedPiece, _capturedPiece);
-        }
-
-        internal override NextMoveAllowedEnPassant GetAllowEnPassantOnNextMoveInfo()
+        internal MoveAllowEnPassantInfo GetAllowEnPassantOnNextMoveInfo()
         {
             return AllowEnPassantOnNextMoves()
-                ? NextMoveAllowedEnPassant.BuildAllowedMove(_endingSquare.Coordinate.File, _movedPiece.Color)
-                : NextMoveAllowedEnPassant.BuildNotAllowedMove();
+                ? MoveAllowEnPassantInfo.BuildAllowedMove(EndingSquare.Coordinate.File, MovedPiece.Color)
+                : MoveAllowEnPassantInfo.BuildNotAllowedMove();
 
-        }
-
-        internal override Square GetMovedPieceEndingSquare()
-        {
-            return _endingSquare;
         }
 
         private bool AllowEnPassantOnNextMoves()
         {
-            return _movedPiece is Pawn
-               && _endingSquare.Coordinate.GetAbsRankDifference(_startingSquare.Coordinate) == 2;
+            return MovedPiece is Pawn
+               && EndingSquare.Coordinate.GetAbsRankDifference(StartingSquare.Coordinate) == 2;
         }
 
         #endregion
     }
+
+    #region Info retrieving classes
+
+    internal class MoveOperations
+    {
+        internal IList<Piece> CapturedPieces { get; }
+        internal IList<PieceMoveInfo> MovedPieces { get; }
+        internal IList<PieceCoordinatePair> AddedPieces { get; }
+        internal Color MovingColor { get; }
+
+        internal MoveOperations(Color movingColor)
+        {
+            MovingColor = movingColor;
+            CapturedPieces = new List<Piece>();
+            MovedPieces = new List<PieceMoveInfo>();
+            AddedPieces = new List<PieceCoordinatePair>();
+        }
+    }
+
+    #endregion
 }

@@ -15,7 +15,7 @@ namespace Presentation
         void OnMoveMade(SquareVM starting, SquareVM ending);
     }
 
-    public class BoardVM : ReactiveViewModelBase, IBoardVM
+    public class BoardVM : ReactiveObject, IBoardVM
     {
         private List<SquareVM> _availableSquares;
         private SquareVM _startingSquare;
@@ -47,6 +47,9 @@ namespace Presentation
             MovesPlayed = new ObservableCollection<MovePair>();
 
             _board.MovePlayed += OnMovePlayed;
+
+            _board.AskForPieceEvent += OnAskForPieceEvent;
+
             _board.BlackTimerChanged += (sender, e) =>
             {
                 BlackTime = _board.GetBlackTime();
@@ -61,6 +64,11 @@ namespace Presentation
             Cells = board.GetSquares()
                          .Select(m => new SquareVM(m, this))
                          .ToList();
+        }
+
+        private void OnAskForPieceEvent(object sender, EventArgs e)
+        {
+            _board.ProvideRequestedPiece(PromoteTo.Queen);
         }
 
         private void OnMovePlayed(object sender, EventArgs e)

@@ -168,7 +168,6 @@
     <Compile Include="Converters\BoolInvertedVisibilityConverter.cs" />
     <Compile Include="Pieces\IImagesFactory.cs" />
     <Compile Include="Pieces\ImagesFactory.cs" />
-    <Compile Include="ReactiveViewModelBase.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Board\ViewModels\BoardVM.cs" />
     <Compile Include="Board\Views\BoardCellControl.xaml.cs">
@@ -185,7 +184,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Utilities\Guard.cs" />
     <Compile Include="MainWindow\ViewModels\MainWindowVM.cs" />
     <Compile Include="MainWindow\Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

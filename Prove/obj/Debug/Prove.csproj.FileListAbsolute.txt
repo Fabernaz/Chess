@@ -1,0 +1,10 @@
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Prove\bin\Debug\Prove.exe.config
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Prove\bin\Debug\Prove.exe
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Prove\bin\Debug\Prove.pdb
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Prove\obj\Debug\Prove.csprojAssemblyReference.cache
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Prove\obj\Debug\Prove.csproj.CoreCompileInputs.cache
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Prove\obj\Debug\Prove.exe
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Prove\obj\Debug\Prove.pdb
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Prove\bin\Debug\Common.dll
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Prove\bin\Debug\Common.pdb
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Prove\obj\Debug\Prove.csproj.CopyComplete

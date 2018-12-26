@@ -8,7 +8,7 @@ namespace ChessCore
         private readonly List<MovePair> _moves;
         private Color _currentPieceMoveColor;
         private MovePair _currentMove;
-        private MoveBase _lastMoveAdded;
+        private Move _lastMoveAdded;
 
         internal MovesSet()
         {
@@ -16,18 +16,18 @@ namespace ChessCore
             _currentPieceMoveColor = Color.White;
         }
 
-        internal MoveBase GetLastMove()
+        internal Move GetLastMove()
         {
             return _lastMoveAdded;
         }
 
-        internal void OnMovePlayed(MoveBase move)
+        internal void OnMovePlayed(Move move)
         {
             RegisterMove(move);
             FlipColor();
         }
 
-        private void RegisterMove(MoveBase move)
+        private void RegisterMove(Move move)
         {
             if (_currentPieceMoveColor.IsWhite)
                 AddNewMovePair(move);
@@ -39,13 +39,13 @@ namespace ChessCore
             _lastMoveAdded = move;
         }
 
-        private void UpdateBlackInLastMove(MoveBase move)
+        private void UpdateBlackInLastMove(Move move)
         {
             _currentMove.BlackMove = move;
             _currentMove = null;
         }
 
-        private void AddNewMovePair(MoveBase move)
+        private void AddNewMovePair(Move move)
         {
             _currentMove = new MovePair(_moves.Count + 1, move);
             _moves.Add(_currentMove);

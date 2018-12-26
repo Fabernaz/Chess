@@ -8,16 +8,8 @@ using System.Windows;
 
 namespace Presentation
 {
-    public static class Utils
+    public static class Extensions
     {
-        public static Size SquareSize(this Size size)
-        {
-            var minSide = GetMinSide(size);
-            size.Height = minSide;
-            size.Width = minSide;
-            return size;
-        }
-
         public static double GetMinSide(this Size size)
         {
             return GetMinSide(size.Height, size.Width);

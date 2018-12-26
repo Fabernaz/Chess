@@ -39,13 +39,13 @@
                     Visibility="{Binding PlayableMoveForPlayer, Converter={StaticResource BoolToVisibilityConverter}}"
                     Opacity="0.5"/>
             
-            <!--<Border Background="White"
+            <Border Background="White"
                     Grid.Row="2" Grid.Column="0"
                     Visibility="{Binding IsControlledByWhite, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
             <Border Background="Black"
                     Grid.Row="2" Grid.Column="2"
-                    Visibility="{Binding IsControlledByBlack, Converter={StaticResource BoolToVisibilityConverter}}"/>-->
+                    Visibility="{Binding IsControlledByBlack, Converter={StaticResource BoolToVisibilityConverter}}"/>
         </Grid>
     </Border>
 </UserControl>

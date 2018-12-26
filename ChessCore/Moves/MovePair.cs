@@ -9,21 +9,15 @@ namespace ChessCore
     public class MovePair
     {
         public int MoveNumber { get; }
-        public MoveBase WhiteMove { get; set; }
-        public MoveBase BlackMove { get; set; }
+        public Move WhiteMove { get; set; }
+        public Move BlackMove { get; set; }
 
-        public MovePair(int moveNumber, MoveBase whiteMove)
+        public MovePair(int moveNumber, Move whiteMove)
         {
             if (moveNumber < 1)
                 throw new ArgumentException();
             MoveNumber = moveNumber;
             WhiteMove = whiteMove;
-        }
-
-        public MovePair(int moveNumber, MoveBase whiteMove, MoveBase blackMove)
-            : this(moveNumber, whiteMove)
-        {
-            BlackMove = blackMove;
         }
 
         public override bool Equals(object obj)

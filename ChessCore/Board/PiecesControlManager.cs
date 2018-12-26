@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Common;
 
 namespace ChessCore
 {
@@ -111,7 +112,7 @@ namespace ChessCore
         internal ISet<SquareCoordinate> GetOpponentControlOnPosition(Square position, Color color)
         {
             var ret = new HashSet<SquareCoordinate>();
-            
+
             var opponentControllingPieces = _piecesControlDict[position]
                                                 .Where(piece => piece.Color.IsOpponentColor(color));
 
@@ -126,7 +127,7 @@ namespace ChessCore
             return _controlledSquares[color].Contains(square);
         }
 
-        private void OnPieceMoved(PieceMove move)
+        private void OnPieceMoved(PieceMoveInfo move)
         {
             var colorControlList = _controlCardinality[move.MovedPiece.Color];
             var previouslyControlledSquares = _control[move.MovedPiece.Color][move.MovedPiece];
@@ -141,17 +142,17 @@ namespace ChessCore
             ResetSquaresControl();
         }
 
-        private void RecalculateControlOnInterfearingPieceMoved(PieceMove move)
+        private void RecalculateControlOnInterfearingPieceMoved(PieceMoveInfo move)
         {
             var controllingPieces = _piecesControlDict[move.StartingSquare];
             foreach (var controllingPiece in controllingPieces.Where(p => !p.Captured).ToList())
-                OnPieceMoved(new PieceMove(move.StartingSquare, move.StartingSquare, controllingPiece, null));
+                OnPieceMoved(new PieceMoveInfo(controllingPiece, move.StartingSquare, move.StartingSquare));
 
             if (!move.IsCapture)
             {
                 controllingPieces = _piecesControlDict[move.EndingSquare];
                 foreach (var controllingPiece in controllingPieces.Where(p => !p.Captured).ToList())
-                    OnPieceMoved(new PieceMove(move.EndingSquare, move.EndingSquare, controllingPiece, null));
+                    OnPieceMoved(new PieceMoveInfo(controllingPiece, move.EndingSquare, move.EndingSquare));
             }
         }
 
@@ -212,20 +213,42 @@ namespace ChessCore
 
         internal void PlayTemporaryMove(TemporaryMoveDisposable disp)
         {
-            var attackingOpponentPieces = _piecesControlDict[disp.StartingSquare];
-            attackingOpponentPieces.Add(disp.MovedPiece);
+            HandleInfluencedPieces(disp);
+            HandleCapturedPiece(disp);
+        }
 
-            foreach (var attackingPiece in attackingOpponentPieces.Where(p => !p.Captured).ToList())
+        private void HandleCapturedPiece(TemporaryMoveDisposable disp)
+        {
+            if (!disp.IsCapture)
+                return;
+
+            var previouslyControlledSquares = _control[disp.CapturedPiece.Color][disp.CapturedPiece];
+            var newControlledSquares = new List<Square>();
+
+            ReplaceSquareInPiecesControlDict(disp.CapturedPiece, newControlledSquares, previouslyControlledSquares);
+
+            disp.Disposing += (sender, e) =>
             {
-                var newControlledSquares = attackingPiece.GetControlledSquares(_board)
-                                             .Select(p => _board.GetSquare(p));
-                var previouslyControlledSquares = _control[attackingPiece.Color][attackingPiece];
+                ReplaceSquareInPiecesControlDict(disp.CapturedPiece, previouslyControlledSquares, newControlledSquares);
+            };
+        }
 
-                ReplaceSquareInPiecesControlDict(attackingPiece, newControlledSquares, previouslyControlledSquares);
+        private void HandleInfluencedPieces(TemporaryMoveDisposable disp)
+        {
+            var influencedPieces = _piecesControlDict[disp.StartingSquare];
+            influencedPieces.Add(disp.MovedPiece);
+
+            foreach (var piece in influencedPieces.Where(p => !p.Captured).ToList())
+            {
+                var newControlledSquares = piece.GetControlledSquares(_board)
+                                             .Select(p => _board.GetSquare(p));
+                var previouslyControlledSquares = _control[piece.Color][piece];
+
+                ReplaceSquareInPiecesControlDict(piece, newControlledSquares, previouslyControlledSquares);
 
                 disp.Disposing += (sender, e) =>
                 {
-                    ReplaceSquareInPiecesControlDict(attackingPiece, previouslyControlledSquares, newControlledSquares);
+                    ReplaceSquareInPiecesControlDict(piece, previouslyControlledSquares, newControlledSquares);
                 };
             }
         }

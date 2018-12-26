@@ -20,4 +20,12 @@ namespace ChessCore
         CastlingQueen,
         EnPassant
     }
+
+    public enum PromoteTo
+    {
+        Queen,
+        Rook,
+        Bishop,
+        Knight
+    }
 }

@@ -113,7 +113,7 @@ namespace ChessCore
             return MoveUtilities.IsKingValidMove(startingSquare.Coordinate, endingSquare.Coordinate);
         }
 
-        public override string GetMoveRepresentation()
+        public override string GetNotation()
         {
             return Resource.KingLetter;
         }

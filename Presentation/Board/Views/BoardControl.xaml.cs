@@ -95,7 +95,7 @@ namespace Presentation
 
         private double GetMinSide()
         {
-            return Utils.GetMinSide(ActualHeight, ActualWidth);
+            return Extensions.GetMinSide(ActualHeight, ActualWidth);
         }
 
         #endregion

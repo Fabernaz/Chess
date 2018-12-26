@@ -5,16 +5,27 @@ namespace Common
 {
     public static class Extensions
     {
-        public static void AddMany<T>(this IList<T> list, IEnumerable<T> items)
+        public static void Add<TKey, TValue>(this IDictionary<TKey, TValue> dict, KeyValuePair<TKey, TValue> pair)
         {
-            foreach (var item in items)
-                list.Add(item);
+            dict.Add(pair.Key, pair.Value);
         }
 
-        public static void AddMany(this IList list, IEnumerable items)
+        public static void AddRange<T>(this ICollection<T> This, IEnumerable<T> toAdd)
         {
-            foreach (var item in items)
-                list.Add(item);
+            if (toAdd == null)
+                return;
+
+            foreach (var a in toAdd)
+                This.Add(a);
+        }
+
+        public static void RemoveRange<T>(this ICollection<T> This, IEnumerable<T> toRemove)
+        {
+            if (toRemove == null)
+                return;
+
+            foreach (var a in toRemove)
+                This.Remove(a);
         }
     }
 }

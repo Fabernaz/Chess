@@ -532,7 +532,7 @@ namespace ChessCore
                 if (lastMove != null)
                 {
                     var lastMoveEnPassantInfo = lastMove.GetAllowEnPassantOnNextMoveInfo();
-                    if (lastMoveEnPassantInfo.IsAllowed)
+                    if (lastMoveEnPassantInfo.AllowEnPassant)
                     {
                         var leftCaptureFile = square.File - 1;
                         var rightCaptureFile = square.File + 1;

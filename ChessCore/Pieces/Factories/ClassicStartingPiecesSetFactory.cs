@@ -36,7 +36,7 @@ namespace ChessCore
             //White queen side knight
             ret.Add(new PieceCoordinatePair(new Knight(Color.White), 
                                             new SquareCoordinate(1, 7)));
-            //White queen side knight
+            //Black king side knight
             ret.Add(new PieceCoordinatePair(new Knight(Color.Black), 
                                             new SquareCoordinate(8, 2)));
             //Black queen side knight
@@ -49,7 +49,7 @@ namespace ChessCore
             //White queen side bishop
             ret.Add(new PieceCoordinatePair(new Bishop(Color.White), 
                                             new SquareCoordinate(1, 6)));
-            //White queen side bishop
+            //Black king side bishop
             ret.Add(new PieceCoordinatePair(new Bishop(Color.Black), 
                                             new SquareCoordinate(8, 3)));
             //Black queen side bishop

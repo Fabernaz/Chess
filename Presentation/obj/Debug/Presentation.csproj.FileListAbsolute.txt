@@ -366,3 +366,5 @@ C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Presentation\obj\De
 C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Presentation\obj\Debug\Presentation.csproj.CopyComplete
 C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Presentation\obj\Debug\Chess.exe
 C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Presentation\obj\Debug\Chess.pdb
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Presentation\bin\Debug\Common.dll
+C:\Users\Nazario\documents\visual studio 2017\Projects\Chess\Presentation\bin\Debug\Common.pdb

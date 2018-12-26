@@ -30,7 +30,7 @@ namespace ChessCore
             return startingSquare.Coordinate.IsOnRankFileOrDiagonal(endingSquare.Coordinate);
         }
 
-        public override string GetMoveRepresentation()
+        public override string GetNotation()
         {
             return Resource.QueenLetter;
         }

@@ -34,7 +34,7 @@ namespace ChessCore
             return true;
         }
 
-        public override string GetMoveRepresentation()
+        public override string GetNotation()
         {
             return Resource.KnightLetter;
         }

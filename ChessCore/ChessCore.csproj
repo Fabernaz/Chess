@@ -53,17 +53,18 @@
     <Compile Include="Board\Timer\TimerManager.cs" />
     <Compile Include="Color\Color.cs" />
     <Compile Include="Enums.cs" />
-    <Compile Include="Moves\MoveTypes\CastlingKingSide.cs" />
-    <Compile Include="Moves\MoveTypes\CastlingQueenSide.cs" />
+    <Compile Include="Moves\MoveAllowEnPassantInfo.cs" />
+    <Compile Include="Moves\MoveTypes\Castle.cs" />
     <Compile Include="Moves\MoveTypes\EnPassant.cs" />
-    <Compile Include="Moves\MoveInfo.cs" />
-    <Compile Include="Moves\MoveTypes\MoveBase.cs" />
+    <Compile Include="Moves\MoveTypes\Move.cs" />
+    <Compile Include="Moves\MoveTypes\PawnPromotion.cs" />
+    <Compile Include="Moves\PieceMoveInfo.cs" />
     <Compile Include="Moves\ValidMoveFactory.cs" />
     <Compile Include="Moves\MovePair.cs" />
     <Compile Include="Moves\MovesSet.cs" />
     <Compile Include="Moves\MovesUtilities.cs" />
-    <Compile Include="Moves\MoveTypes\Move.cs" />
     <Compile Include="Pieces\Factories\IStartingPiecesSetFactory.cs" />
+    <Compile Include="Pieces\Factories\PieceFactory.cs" />
     <Compile Include="Pieces\Factories\TestStartingPiecesFactory.cs" />
     <Compile Include="Pieces\King.cs" />
     <Compile Include="Pieces\Knight.cs" />
@@ -80,7 +81,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resource.resx</DependentUpon>
     </Compile>
-    <Compile Include="Utilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">

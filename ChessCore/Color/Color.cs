@@ -21,6 +21,7 @@
         internal int EnPassantStartingRank { get; }
         internal int EnPassantEndingRank { get; }
         internal int PawnFirstRank { get; }
+        internal int LastRank { get; }
         internal Color OpponentColor => _Color == PieceColor.White ? Black : White;
 
         public bool IsBlack { get; }
@@ -43,6 +44,7 @@
             MovingDirection = color == PieceColor.White ? 1 : -1;
             FirstRank = color == PieceColor.White ? 1 : 8;
             EnPassantEndingRank = color == PieceColor.White ? 6 : 3;
+            LastRank = color == PieceColor.White ? 8 : 1;
         }
 
         #endregion

@@ -1,40 +1,79 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Common;
 
 namespace ChessCore
 {
     internal class ValidMoveFactory
     {
+        private readonly InfoAsker<PromoteTo> _promoteToAsker;
+        private readonly PieceFactory _pieceFactory;
+
+        internal ValidMoveFactory(InfoAsker<PromoteTo> infoAsker)
+        {
+            Guard.ArgumentNotNull(infoAsker, nameof(infoAsker));
+            _promoteToAsker = infoAsker;
+
+            _pieceFactory = new PieceFactory();
+        }
+
         internal bool TryCreateValidMove(Square startingSquare,
                                          Square endingSquare,
                                          Board board,
-                                         out MoveBase move)
+                                         out Move move)
         {
-            return TryEnPassant(startingSquare, endingSquare, board, out move)
+            return TryPawnPromotion(startingSquare, endingSquare, out move)
+                || TryEnPassant(startingSquare, endingSquare, board, out move)
                 || TryCastle(board, startingSquare, endingSquare, out move)
                 || TryGenericMove(startingSquare, endingSquare, board, out move);
         }
 
+        #region Pawn promotion
+
+        private bool TryPawnPromotion(Square startingSquare, Square endingSquare, out Move move)
+        {
+            move = null;
+            var isValid = GetIsValidPawnPromotion(startingSquare, endingSquare);
+            if (isValid)
+                move = GetPawnPromotion(startingSquare, endingSquare);
+            return isValid;
+        }
+
+        private Move GetPawnPromotion(Square startingSquare, Square endingSquare)
+        {
+            var promotedTo = _pieceFactory.CreatePiece(_promoteToAsker.AskAndWaitForInfo(),
+                                                       startingSquare.Piece.Color);
+
+            return new PawnPromotion(startingSquare,
+                                     endingSquare,
+                                     promotedTo,
+                                     null);
+        }
+
+        private bool GetIsValidPawnPromotion(Square startingSquare, Square endingSquare)
+        {
+            return startingSquare.Piece is Pawn
+                && startingSquare.Piece.Color.LastRank == endingSquare.Coordinate.Rank;
+        }
+
+        #endregion
+
         #region En passant
 
-        private MoveBase GetEnPassantMove(Square startingSquare,
+        private Move GetEnPassantMove(Square startingSquare,
                                           Square endingSquare,
                                           Board board)
         {
-            return new EnPassant(startingSquare.Piece as Pawn,
-                                 startingSquare,
+            return new EnPassant(startingSquare,
                                  endingSquare,
-                                 board.GetLastMovedPiece() as Pawn,
-                                 board.GetLastMove().GetMovedPieceEndingSquare());
+                                 board.GetLastMove().EndingSquare,
+                                 null);
         }
 
         private bool TryEnPassant(Square startingSquare,
                                   Square endingSquare,
                                   Board board,
-                                  out MoveBase move)
+                                  out Move move)
         {
             move = null;
             var isValid = GetIsValidEnPassantMove(startingSquare, endingSquare, board);
@@ -55,7 +94,7 @@ namespace ChessCore
                 return false;
 
             var lastMoveEnPassantInfo = lastMove.GetAllowEnPassantOnNextMoveInfo();
-            if (!lastMoveEnPassantInfo.IsAllowed)
+            if (!lastMoveEnPassantInfo.AllowEnPassant)
                 return false;
 
             return lastMoveEnPassantInfo.IsEnPassantRankAndFile(startingSquare.Piece.Color,
@@ -69,7 +108,7 @@ namespace ChessCore
 
         #region Castling
 
-        private bool TryCastle(Board board, Square startingSquare, Square endingSquare, out MoveBase move)
+        private bool TryCastle(Board board, Square startingSquare, Square endingSquare, out Move move)
         {
             move = null;
             CastleType? castleType = null;
@@ -77,7 +116,7 @@ namespace ChessCore
 
             var isValid = GetIsValidCastleMove(board, startingSquare, endingSquare, out castleType, out king);
             if (isValid)
-                move = GetCastleMove(board, castleType.Value, king);
+                move = GetCastleMove(board, king, castleType.Value);
 
             return isValid;
         }
@@ -94,19 +133,11 @@ namespace ChessCore
                 && MoveUtilities.CanCastle(king, board, castleType.Value);
         }
 
-        private MoveBase GetCastleMove(Board board, CastleType castleType, King king)
+        private Move GetCastleMove(Board board, King king, CastleType castleType)
         {
             var rook = board.GetSquare(king.GetCastleRookStartingSquare(castleType)).Piece as Rook;
 
-            switch (castleType)
-            {
-                case CastleType.KingSide:
-                    return new CastlingKingSide(king, rook, board);
-                case CastleType.QueenSide:
-                    return new CastlingQueenSide(king, rook, board);
-                default:
-                    throw new NotImplementedException();
-            }
+            return new Castle(king, rook, board, castleType);
         }
 
         private bool IsCastleMove(King king, Square startingSquare, Square endingSquare, out CastleType? type)
@@ -132,12 +163,12 @@ namespace ChessCore
 
         #endregion
 
-        #region Generic move
+        #region Base move
 
         private bool TryGenericMove(Square startingSquare,
-                                          Square endingSquare,
-                                          Board board,
-                                          out MoveBase move)
+                                    Square endingSquare,
+                                    Board board,
+                                    out Move move)
         {
             move = null;
 
@@ -145,22 +176,9 @@ namespace ChessCore
             if (isValid)
                 move = new Move(startingSquare,
                                 endingSquare,
-                                startingSquare.Piece,
-                                endingSquare.Piece,
-                                endingSquare.Piece != null,
-                                GetAmbiguousMove(board, endingSquare.Coordinate, startingSquare.Piece),
-                                null);
+                                GetAmbiguousMoveStartingSquare(board, endingSquare, startingSquare.Piece));
 
             return isValid;
-        }
-
-        private Move GetAmbiguousMove(Board board, SquareCoordinate endingCoordinate, Piece movedPiece)
-        {
-            if (!board.ExistsPlayingPieceOfSameTypeAndColor(movedPiece)
-                || movedPiece is Bishop)
-                return null;
-
-            return null;
         }
 
         #region Move validity
@@ -233,5 +251,25 @@ namespace ChessCore
         #endregion
 
         #endregion
+
+        #region Ambiguous move
+
+        private Square GetAmbiguousMoveStartingSquare(Board board, Square endingSquare, Piece movedPiece)
+        {
+            var samePieces = board.GetAllPlayingPiecesOfSameTypeAndColor(movedPiece.GetType(), movedPiece.Color)
+                                  .Where(p => !p.Equals(movedPiece));
+
+            foreach(var piece in samePieces)
+            {
+                var concurrentPieceStartingPosition = samePieces.FirstOrDefault(p => p.GetAvailableMoves().ToList().Contains(endingSquare.Coordinate))?.CurrentSquare;
+                if (concurrentPieceStartingPosition != null)
+                    return concurrentPieceStartingPosition;
+            }
+
+            return null;
+        }
+
+        #endregion
+
     }
 }

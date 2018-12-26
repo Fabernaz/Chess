@@ -10,11 +10,11 @@ namespace ChessCore
     public class PieceCoordinatePair
     {
         public Piece Piece { get; }
-        public SquareCoordinate SquareCoordinate { get; }
+        public SquareCoordinate Coordinate { get; }
         public PieceCoordinatePair(Piece piece, SquareCoordinate squareCoordinate)
         {
             Piece = piece;
-            SquareCoordinate = squareCoordinate;
+            Coordinate = squareCoordinate;
         }
     }
 }

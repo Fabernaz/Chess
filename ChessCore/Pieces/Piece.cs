@@ -53,7 +53,7 @@ namespace ChessCore
 
         protected abstract IEnumerable<SquareCoordinate> GetNewControlledSquares(Board board);
 
-        public abstract string GetMoveRepresentation();
+        public abstract string GetNotation();
 
         public IEnumerable<SquareCoordinate> GetAvailableMoves()
         {

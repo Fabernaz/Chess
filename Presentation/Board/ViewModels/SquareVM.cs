@@ -5,7 +5,7 @@ using ReactiveUI;
 
 namespace Presentation
 {
-    public class SquareVM : ReactiveViewModelBase
+    public class SquareVM : ReactiveObject
     {
         private bool _movingPiece;
         private bool _playableMoveForPlayer;

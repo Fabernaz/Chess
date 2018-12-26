@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Common;
 
 namespace ChessCore
 {
@@ -132,8 +133,8 @@ namespace ChessCore
                                            .Select(p => p.Piece);
             allInfluencedPieces.AddRange(previouslyAttackedPieces);
 
-            foreach (var attackedPiece in allInfluencedPieces)
-                attackedPiece.ResetAvailableMoves(_board);
+            foreach (var piece in allInfluencedPieces.Where(p => !p.Captured))
+                piece.ResetAvailableMoves(_board);
         }
 
         private void HandlePawnMobility(Piece piece, params SquareCoordinate[] squares)
